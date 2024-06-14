@@ -1,1 +1,1 @@
-# Mini-Project-WeatherApp
+# WeatherWise
