@@ -1,46 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    <div id="app">
-        <div class="current-weather">
-            <img src="placeholder-weather-icon.png" alt="Weather Icon" class="weather-icon">
-            <div class="temperature">--℉</div>
-            <div class="location">Locating...</div>
-            <div class="temp-range">Max: --℉ Min: --℉</div>
-        </div>
-        <div class="forecast">
-            <div class="today-forecast">
-                <div class="forecast-header">Today <span class="date"></span></div>
-                <div class="hourly-forecast">
-                    <div class="hour">
-                        <img src="placeholder-weather-icon.png" alt="Weather Icon">
-                        <div class="temp">--℉</div>
-                        <div class="time">--:--</div>
-                    </div>
-                    <!-- Additional hourly forecast elements will be added dynamically -->
-                </div>
-            </div>
-            <div class="seven-days-forecast">
-                <div class="forecast-header">7-Days Forecasts</div>
-                <div class="daily-forecast">
-                    <div class="day">
-                        <img src="placeholder-weather-icon.png" alt="Weather Icon">
-                        <div class="temp">--℉</div>
-                        <div class="day-name">--</div>
-                    </div>
-                    <!-- Additional daily forecast elements will be added dynamically -->
-                </div>
-            </div>
-        </div>
-        <input type="text" id="city" placeholder="Enter city name">
-        <button id="getWeather">Get Weather</button>
-    </div>
-    <script src="index.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Weather Wise app"
+    />
+    <title>Weather Wise</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
