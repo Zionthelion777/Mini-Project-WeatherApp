@@ -4,6 +4,7 @@ body {
     color: white;
     text-align: center;
     padding: 20px;
+<<<<<<< HEAD
 }
 
 #app {
@@ -31,17 +32,53 @@ body {
 }
 
 .forecast {
+=======
+  }
+  
+  #app {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .current-weather {
+    margin-top: 20px;
+  }
+  
+  .weather-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .temperature {
+    font-size: 48px;
+    margin: 10px 0;
+  }
+  
+  .location,
+  .temp-range {
+    font-size: 18px;
+  }
+  
+  .forecast {
+>>>>>>> 8bf399f146e2be0041d5f12812b476a9c3e50c38
     margin-top: 20px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     padding: 10px;
+<<<<<<< HEAD
 }
 
 .forecast-header {
+=======
+  }
+  
+  .forecast-header {
+>>>>>>> 8bf399f146e2be0041d5f12812b476a9c3e50c38
     font-size: 16px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+<<<<<<< HEAD
 }
 
 .hourly-forecast,
@@ -71,11 +108,43 @@ body {
 }
 
 #city {
+=======
+  }
+  
+  .hourly-forecast,
+  .daily-forecast {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .hour,
+  .day {
+    text-align: center;
+  }
+  
+  .hour img,
+  .day img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .temp {
+    font-size: 16px;
+  }
+  
+  .time,
+  .day-name {
+    font-size: 14px;
+  }
+  
+  #city {
+>>>>>>> 8bf399f146e2be0041d5f12812b476a9c3e50c38
     width: 100%;
     padding: 10px;
     margin-top: 20px;
     border: none;
     border-radius: 5px;
+<<<<<<< HEAD
 }
 
 #city:focus {
@@ -83,6 +152,15 @@ body {
 }
 
 #getWeather {
+=======
+  }
+  
+  #city:focus {
+    outline: none;
+  }
+  
+  #getWeather {
+>>>>>>> 8bf399f146e2be0041d5f12812b476a9c3e50c38
     width: 100%;
     padding: 10px;
     margin-top: 10px;
@@ -91,8 +169,16 @@ body {
     background: #4e54c8;
     color: white;
     cursor: pointer;
+<<<<<<< HEAD
 }
 
 #getWeather:hover {
     background: #3b3f99;
 }
+=======
+  }
+  
+  #getWeather:hover {
+    background: #3b3f99;
+  }
+>>>>>>> 8bf399f146e2be0041d5f12812b476a9c3e50c38
