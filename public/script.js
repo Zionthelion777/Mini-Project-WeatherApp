@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
-        const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+        const apiKey = '260e557b72c4510447791a3b93ba60fb'; // Replace with your OpenWeatherMap API key
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
 
         fetch(apiUrl)
