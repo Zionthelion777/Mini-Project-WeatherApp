@@ -8,10 +8,38 @@
 </head>
 <body>
     <div id="app">
-        <h1>Weather App</h1>
+        <div class="current-weather">
+            <img src="placeholder-weather-icon.png" alt="Weather Icon" class="weather-icon">
+            <div class="temperature">--℉</div>
+            <div class="location">Locating...</div>
+            <div class="temp-range">Max: --℉ Min: --℉</div>
+        </div>
+        <div class="forecast">
+            <div class="today-forecast">
+                <div class="forecast-header">Today <span class="date"></span></div>
+                <div class="hourly-forecast">
+                    <div class="hour">
+                        <img src="placeholder-weather-icon.png" alt="Weather Icon">
+                        <div class="temp">--℉</div>
+                        <div class="time">--:--</div>
+                    </div>
+                    <!-- Additional hourly forecast elements will be added dynamically -->
+                </div>
+            </div>
+            <div class="seven-days-forecast">
+                <div class="forecast-header">7-Days Forecasts</div>
+                <div class="daily-forecast">
+                    <div class="day">
+                        <img src="placeholder-weather-icon.png" alt="Weather Icon">
+                        <div class="temp">--℉</div>
+                        <div class="day-name">--</div>
+                    </div>
+                    <!-- Additional daily forecast elements will be added dynamically -->
+                </div>
+            </div>
+        </div>
         <input type="text" id="city" placeholder="Enter city name">
         <button id="getWeather">Get Weather</button>
-        <div id="weatherResult"></div>
     </div>
     <script src="script.js"></script>
 </body>
