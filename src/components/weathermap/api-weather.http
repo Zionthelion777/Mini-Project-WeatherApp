@@ -1,0 +1,2 @@
+GET https://api.weather.gov/alerts/active/count
+
