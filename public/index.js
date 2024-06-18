@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     document.querySelector('.location').innerHTML = location;
                     document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}℉ Min: ${minTemp}℉`;
 
-                    
+
                 } else {
                     alert('Error fetching weather data. Please try again.');
                 }
@@ -31,41 +31,50 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
     
     //fetches hourly forecast
-    function fetch24HourWeatherData(lat, lon) {
-        const apiKey = '260e557b72c4510447791a3b93ba60fb';
+    function fetchHourlyForecast(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,daily,alerts&appid=${apiKey}&units=imperial`;
-        
+
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.hourly) {
-                    const hourlyData = data.hourly.slice(0, 24);
-        
-                    //Temperature for each hour
-                    const hourlyTemps = hourlyData.map((hourData, index) => {
-                        const date = new Date(hourData.dt * 1000);
-                        const hours = date.getHours();
-                        const temperature = hourData.temp;
-                        return `Hour ${hours}: ${temperature}℉`;
+                    const hourlyForecastContainer = document.querySelector('.hourly-forecast');
+                    hourlyForecastContainer.innerHTML = ''; // Clear any previous data
+
+                    data.hourly.slice(0, 24).forEach(hour => {
+                        const time = convertUnixToReadableTime(hour.dt);
+                        const temperature = hour.temp;
+                        const weatherIcon = hour.weather[0].icon;
+
+                        const hourElement = document.createElement('div');
+                        hourElement.classList.add('hour');
+
+                        hourElement.innerHTML = `
+                            <div class="time">${time}</div>
+                            <img src="http://openweathermap.org/img/wn/${weatherIcon}.png" alt="Weather icon">
+                            <div class="temp">${temperature}℉</div>
+                        `;
+
+                        hourlyForecastContainer.appendChild(hourElement);
                     });
-
-                    document.querySelector('.hourly-forecast').innerHTML = hourlyTemps.join('<br>');
-                    document.querySelector('.hour').innerHTML = hours.join('<br>');
-                    document.querySelector('.day').innerHTML = date.join('<br>');
-
-        
                 } else {
-                    alert('Error fetching weather data. Please try again.');
+                    alert('Error fetching hourly forecast data. Please try again.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching the weather data:', error);
-                alert('Error fetching the weather data. Please try again later.');
+                console.error('Error fetching the hourly forecast data:', error);
+                alert('Error fetching the hourly forecast data. Please try again later.');
             });
     }
-        
 
-  
+    // Function to convert Unix time to a human-readable format
+    function convertUnixToReadableTime(unixTime) {
+        const date = new Date(unixTime * 1000);
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes} UTC`;
+    }
+
     // Function to get current location
     function getCurrentLocation() {
         if (navigator.geolocation) {
@@ -73,6 +82,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
+                fetchHourlyForecast(lat, lon);
+
             }, (error) => {
                 console.error('Error getting location:', error);
                 alert('Error getting location. Please enter the city manually.');
