@@ -25,7 +25,17 @@ body {
   margin: 10px 0;
 }
 
-.location,
+.location-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Add space between location and button */
+}
+
+.location {
+  font-size: 18px;
+}
+
 .temp-range {
   font-size: 18px;
 }
@@ -94,5 +104,18 @@ body {
 }
 
 #getWeather:hover {
+  background: #3b3f99;
+}
+
+#toggleUnits {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background: #4e54c8;
+  color: white;
+  cursor: pointer;
+}
+
+#toggleUnits:hover {
   background: #3b3f99;
 }

@@ -11,7 +11,10 @@
         <div class="current-weather">
             <img src="placeholder-weather-icon.png" alt="Weather Icon" class="weather-icon">
             <div class="temperature">--℉</div>
-            <div class="location">Locating...</div>
+            <div class="location-container">
+                <div class="location">Locating...</div>
+                <button id="toggleUnits">℉/℃</button> <!-- Moved button inside .location-container -->
+            </div>
             <div class="temp-range">Max: --℉ Min: --℉</div>
         </div>
         <div class="forecast">
