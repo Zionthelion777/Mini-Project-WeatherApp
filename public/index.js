@@ -29,50 +29,66 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the weather data. Please try again later.');
             });
     }
-    
-    //fetches hourly forecast
-    function fetchHourlyForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,daily,alerts&appid=${apiKey}&units=imperial`;
+
+    function fiveDayweatherForecast(lat, lon) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
 
         fetch(apiUrl)
-            .then(response => response.json())
+            .then(resp => resp.json())
             .then(data => {
-                if (data.hourly) {
-                    const hourlyForecastContainer = document.querySelector('.hourly-forecast');
-                    hourlyForecastContainer.innerHTML = ''; // Clear any previous data
-
-                    data.hourly.slice(0, 24).forEach(hour => {
-                        const time = convertUnixToReadableTime(hour.dt);
-                        const temperature = hour.temp;
-                        const weatherIcon = hour.weather[0].icon;
-
-                        const hourElement = document.createElement('div');
-                        hourElement.classList.add('hour');
-
-                        hourElement.innerHTML = `
-                            <div class="time">${time}</div>
-                            <img src="http://openweathermap.org/img/wn/${weatherIcon}.png" alt="Weather icon">
-                            <div class="temp">${temperature}℉</div>
-                        `;
-
-                        hourlyForecastContainer.appendChild(hourElement);
-                    });
+                if (data.cod === "200") {
+                    console.log('--->'+(JSON.stringify(data)));
+                    drawWeather(data);
                 } else {
-                    alert('Error fetching hourly forecast data. Please try again.');
+                    alert('Error fetching 5-day forecast data. Please try again.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching the hourly forecast data:', error);
-                alert('Error fetching the hourly forecast data. Please try again later.');
+                console.error('Error fetching the 5-day forecast data:', error);
+                alert('Error fetching the 5-day forecast data. Please try again later.');
             });
     }
 
-    // Function to convert Unix time to a human-readable format
-    function convertUnixToReadableTime(unixTime) {
-        const date = new Date(unixTime * 1000);
-        const hours = date.getUTCHours().toString().padStart(2, '0');
-        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes} UTC`;
+    // Draws the weather forecast
+    function drawWeather(data) {
+        const dailyForecastContainer = document.querySelector('.daily-forecast');
+        dailyForecastContainer.innerHTML = ''; // Clear any previous data
+
+        // Group forecasts by day and find the max temperature for each day
+        const dailyForecasts = {};
+
+        data.list.forEach(forecast => {
+            const date = new Date(forecast.dt * 1000);
+            const day = date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
+
+            if (!dailyForecasts[day]) {
+                dailyForecasts[day] = {
+                    maxTemp: forecast.main.temp,
+                    icon: forecast.weather[0].icon
+                };
+            } else {
+                if (forecast.main.temp > dailyForecasts[day].maxTemp) {
+                    dailyForecasts[day].maxTemp = forecast.main.temp;
+                    dailyForecasts[day].icon = forecast.weather[0].icon;
+                }
+            }
+        });
+
+        // Display the daily forecasts
+        Object.keys(dailyForecasts).forEach(day => {
+            const forecast = dailyForecasts[day];
+
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('day');
+
+            dayElement.innerHTML = `
+                <div class="day-name">${day}</div>
+                <img src="http://openweathermap.org/img/wn/${forecast.icon}.png" alt="Weather icon">
+                <div class="temp">${forecast.maxTemp}℉</div>
+            `;
+
+            dailyForecastContainer.appendChild(dayElement);
+        });
     }
 
     // Function to get current location
@@ -82,7 +98,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
-                fetchHourlyForecast(lat, lon);
+               // fetchHourlyForecast(lat, lon);
+               fiveDayweatherForecast(lat, lon);
 
             }, (error) => {
                 console.error('Error getting location:', error);
@@ -101,6 +118,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const city = document.getElementById('city').value;
         const apiKey = '260e557b72c4510447791a3b93ba60fb'; 
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
   
         fetch(apiUrl)
             .then(response => response.json())
@@ -126,6 +144,21 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .catch(error => {
                 console.error('Error fetching the weather data:', error);
                 alert('Error fetching the weather data. Please try again later.');
+            });
+
+        fetch(apiUrl2)
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    console.log('--->'+(JSON.stringify(data)));
+                    drawWeather(data);
+                } else {
+                    alert('Error fetching 5-day forecast data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the 5-day forecast data:', error);
+                alert('Error fetching the 5-day forecast data. Please try again later.');
             });
         });
   });
