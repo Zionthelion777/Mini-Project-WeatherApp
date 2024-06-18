@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './index.css'; // Assuming your CSS file is named index.css
 
-function TemperatureMap() {
+function WeatherMap() {
     return (
         <div id="app">
             <div className="header">
@@ -26,7 +26,7 @@ function TemperatureMap() {
     );
 }
 
-export default TemperatureMap;
+export default WeatherMap;
 
 
 
