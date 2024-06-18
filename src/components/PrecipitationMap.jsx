@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import 'src/index.css'; 
-import 'src/custom-styles.css'
+
 
 function PrecipitationMap() {
     return (

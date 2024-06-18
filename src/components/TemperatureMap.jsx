@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './index.css'; // Assuming your CSS file is named index.css
 
 function TemperatureMap() {
     return (
