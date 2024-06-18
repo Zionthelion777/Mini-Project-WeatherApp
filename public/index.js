@@ -10,16 +10,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(data => {
                 if (data.cod === 200) {
                     const weatherDescription = data.weather[0].description;
-                    const temperature = data.main.temp;
+                    const temperature = Math.round(data.main.temp);
                     const location = data.name;
-                    const maxTemp = data.main.temp_max;
-                    const minTemp = data.main.temp_min;
+                    const maxTemp = Math.round(data.main.temp_max);
+                    const minTemp = Math.round(data.main.temp_min);
 
-                    document.querySelector('.temperature').innerHTML = `${temperature}℉`;
+                    const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
+
+                    document.querySelector('.temperature').innerHTML = `${temperature}${tempUnit}`;
                     document.querySelector('.location').innerHTML = location;
-                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}℉ Min: ${minTemp}℉`;
-
-
+                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}${tempUnit} Min: ${minTemp}${tempUnit}`;
                 } else {
                     alert('Error fetching weather data. Please try again.');
                 }
@@ -31,13 +31,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function fiveDayweatherForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
 
         fetch(apiUrl)
             .then(resp => resp.json())
             .then(data => {
                 if (data.cod === "200") {
-                    console.log('--->'+(JSON.stringify(data)));
+                    console.log('--->' + (JSON.stringify(data)));
                     drawWeather(data);
                 } else {
                     alert('Error fetching 5-day forecast data. Please try again.');
@@ -63,16 +63,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             if (!dailyForecasts[day]) {
                 dailyForecasts[day] = {
-                    maxTemp: forecast.main.temp,
+                    maxTemp: Math.round(forecast.main.temp),
                     icon: forecast.weather[0].icon
                 };
             } else {
-                if (forecast.main.temp > dailyForecasts[day].maxTemp) {
-                    dailyForecasts[day].maxTemp = forecast.main.temp;
+                if (Math.round(forecast.main.temp) > dailyForecasts[day].maxTemp) {
+                    dailyForecasts[day].maxTemp = Math.round(forecast.main.temp);
                     dailyForecasts[day].icon = forecast.weather[0].icon;
                 }
             }
         });
+
+        const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
 
         // Display the daily forecasts
         Object.keys(dailyForecasts).forEach(day => {
@@ -84,7 +86,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             dayElement.innerHTML = `
                 <div class="day-name">${day}</div>
                 <img src="http://openweathermap.org/img/wn/${forecast.icon}.png" alt="Weather icon">
-                <div class="temp">${forecast.maxTemp}℉</div>
+                <div class="temp">${forecast.maxTemp}${tempUnit}</div>
             `;
 
             dailyForecastContainer.appendChild(dayElement);
@@ -98,9 +100,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
-               // fetchHourlyForecast(lat, lon);
-               fiveDayweatherForecast(lat, lon);
-
+                fiveDayweatherForecast(lat, lon);
             }, (error) => {
                 console.error('Error getting location:', error);
                 alert('Error getting location. Please enter the city manually.');
@@ -110,25 +110,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    function convertTemperature(value, toUnit) {
-        if (toUnit === 'metric') {
-            return Math.round((value - 32) * 5 / 9); // Convert and round
-        } else {
-            return Math.round((value * 9 / 5) + 32); // Convert and round
-        }
-    }
+    // Get current location on page load
+    getCurrentLocation();
 
-    document.getElementById('getWeather').addEventListener('click', function() {
+    // Fetch weather data based on city input
+    document.getElementById('getWeather').addEventListener('click', function () {
         const city = document.getElementById('city').value;
-        const apiKey = '260e557b72c4510447791a3b93ba60fb'; 
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
-        const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
-  
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${currentUnits}`;
+        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${currentUnits}`;
+
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === 200) {
-                    updateWeatherUI(data);
+                    const weatherDescription = data.weather[0].description;
+                    const temperature = Math.round(data.main.temp);
+                    const location = data.name;
+                    const maxTemp = Math.round(data.main.temp_max);
+                    const minTemp = Math.round(data.main.temp_min);
+
+                    const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
+
+                    document.querySelector('.temperature').innerHTML = `${temperature}${tempUnit}`;
+                    document.querySelector('.location').innerHTML = location;
+                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}${tempUnit} Min: ${minTemp}${tempUnit}`;
                 } else {
                     alert('City not found. Please try again.');
                 }
@@ -142,7 +147,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(resp => resp.json())
             .then(data => {
                 if (data.cod === "200") {
-                    console.log('--->'+(JSON.stringify(data)));
+                    console.log('--->' + (JSON.stringify(data)));
                     drawWeather(data);
                 } else {
                     alert('Error fetching 5-day forecast data. Please try again.');
@@ -152,5 +157,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 console.error('Error fetching the 5-day forecast data:', error);
                 alert('Error fetching the 5-day forecast data. Please try again later.');
             });
-        });
-  });
+    });
+
+    // Toggle units between Celsius and Fahrenheit
+    document.getElementById('toggleUnits').addEventListener('click', function () {
+        currentUnits = currentUnits === 'imperial' ? 'metric' : 'imperial';
+        const buttonText = currentUnits === 'imperial' ? 'Switch to Celsius' : 'Switch to Fahrenheit';
+        this.innerHTML = buttonText;
+
+        // Update the weather data using the new units
+        getCurrentLocation();
+    });
+});
