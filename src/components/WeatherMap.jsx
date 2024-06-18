@@ -1,36 +1,35 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './index.css'; // Assuming your CSS file is named index.css
+import { Link } from 'react-router-dom'
+
+
+
 
 function WeatherMap() {
     return (
-        <div id="app">
-            <div className="header">
-                <h1>Temperature Map</h1>
-            </div>
-            <div className="map-container">
-                <img src="placeholder-temperature-map.png" alt="Temperature Map" className="map-placeholder" />
-            </div>
-            <div className="footer">
-                <Link to="/temperature" className="map-icon active">
-                    <img src="temperature-icon.png" alt="Temperature Map" title="Temperature Map" />
-                </Link>
-                <Link to="/precipitation" className="map-icon">
-                    <img src="precipitation-icon.png" alt="Precipitation Map" title="Precipitation Map" />
-                </Link>
-                <Link to="/wind" className="map-icon">
-                    <img src="wind-icon.png" alt="Wind Map" title="Wind Map" />
-                </Link>
-            </div>
+        <div>
+            <h1>Weather Map Page</h1>
         </div>
-    );
+    )
 }
 
-export default WeatherMap;
+export default WeatherMap
 
 
-
-
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Map</title>
+    <link rel="stylesheet" href="../index.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Weather Map</h1>
+        <input type="text" id="city" placeholder="Enter city name">
+        <button id="getWeather">Get Weather</button>
+        <div id="weatherResult"></div>
+    </div>
+    <script src="../script.js"></script>
+</body>
+</html>
 
