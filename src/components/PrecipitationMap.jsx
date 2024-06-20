@@ -5,7 +5,7 @@ function PrecipitationMap() {
     return (
         <div id="app">
             <div className="header">
-                <h1>Temperature Map</h1>
+                <h1>Precipitation Map</h1>
             </div>
             <div className="map-container">
                 <img src="placeholder-temperature-map.png" alt="Temperature Map" className="map-placeholder" />

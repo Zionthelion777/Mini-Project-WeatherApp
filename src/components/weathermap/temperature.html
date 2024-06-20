@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Weather Map</title>
-    <link rel="stylesheet" href="../../../public/index.css">
+    <link rel="stylesheet" href="../../../src/index.css">
     <style>
-        /* Additional styles for the new layout */
-        body {
+                /* Additional styles for the new layout */
+                body {
             margin: 0;
             display: flex;
             justify-content: center;
@@ -59,6 +59,12 @@
             text-align: center;
             text-decoration: none;
             flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .footer .active {
+            background-color: rgba(0, 0, 0, 0.5); /* Darker color for the active map */
         }
 
         .footer img {
@@ -76,7 +82,7 @@
             <img src="placeholder-temperature-map.png" alt="Temperature Map" class="map-placeholder">
         </div>
         <div class="footer">
-            <a href="temperature.html" class="map-icon">
+            <a href="temperature.html" class="map-icon active">
                 <img src="temperature-icon.png" alt="Temperature Map" title="Temperature Map">
             </a>
             <a href="precipitation.html" class="map-icon">
@@ -87,6 +93,6 @@
             </a>
         </div>
     </div>
-    <script src="../../../public/index.js"></script>
+    <script src="../../../src/index.js"></script>
 </body>
 </html>

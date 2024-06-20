@@ -12,13 +12,13 @@ function TemperatureMap() {
             </div>
             <div className="footer">
                 <Link to="/temperature-map" className="map-icon active">
-                    <img src="temperature-icon.png" alt="Temperature Map" title="Temperature Map" />
+                    <img src="src/components/icons8-temperature-50.png" alt="Temperature Map" title="Temperature Map" />
                 </Link>
                 <Link to="/precipitation-map" className="map-icon">
-                    <img src="precipitation-icon.png" alt="Precipitation Map" title="Precipitation Map" />
+                    <img src="src/components/icons8-precipitation-50.png" alt="Precipitation Map" title="Precipitation Map" />
                 </Link>
                 <Link to="/wind-map" className="map-icon">
-                    <img src="wind-icon.png" alt="Wind Map" title="Wind Map" />
+                    <img src="src/components/icons8-wind-50.png" alt="Wind Map" title="Wind Map" />
                 </Link>
             </div>
         </div>
