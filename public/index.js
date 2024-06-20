@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
-               // fetchHourlyForecast(lat, lon);
-               fiveDayweatherForecast(lat, lon);
+                //fetchHourlyForecast(lat, lon);
+                fiveDayweatherForecast(lat, lon);
 
             }, (error) => {
                 console.error('Error getting location:', error);
@@ -109,10 +109,61 @@ document.addEventListener('DOMContentLoaded', (event) => {
             alert('Geolocation is not supported by this browser.');
         }
     }
-  
+
+    // Autocomplete function for city names
+    function autocompleteCityName() {
+        const input = document.getElementById('city');
+        const suggestionsContainer = document.getElementById('suggestions');
+
+        input.addEventListener('input', function () {
+            const query = input.value.trim();
+
+            if (query.length > 0) {
+                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=imperial`;
+
+                fetch(apiUrl)
+                    .then(resp => resp.json())
+                    .then(data => {
+                        if (data.cod === "200") {
+                            suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                            suggestionsContainer.style.display = 'block'; // Show suggestions container
+
+                            data.list.forEach(city => {
+                                const suggestion = document.createElement('div');
+                                suggestion.textContent = `${city.name}, ${city.sys.country}`;
+                                suggestion.addEventListener('click', function () {
+                                    input.value = city.name;
+                                    suggestionsContainer.innerHTML = '';
+                                    suggestionsContainer.style.display = 'none';
+                                });
+                                suggestionsContainer.appendChild(suggestion);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching city suggestions:', error);
+                    });
+            } else {
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!suggestionsContainer.contains(e.target) && e.target !== input) {
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
+
     // Get current location on page load
     getCurrentLocation();
-  
+
+    // Initialize city name autocomplete
+    autocompleteCityName();
+
+
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
