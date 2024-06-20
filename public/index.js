@@ -160,12 +160,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 
     // Toggle units between Celsius and Fahrenheit
-    document.getElementById('toggleUnits').addEventListener('click', function () {
+    document.getElementById('toggleUnits').addEventListener('click', function() {
         currentUnits = currentUnits === 'imperial' ? 'metric' : 'imperial';
-        const buttonText = currentUnits === 'imperial' ? '°F/°C' : '°C/°F';
+        const buttonText = currentUnits === 'imperial' ? '°C/°F' : '°F/°C';
         this.innerHTML = buttonText;
 
         // Update the weather data using the new units
         getCurrentLocation();
     });
+
+    // Get current location on page load
+    getCurrentLocation();
 });
