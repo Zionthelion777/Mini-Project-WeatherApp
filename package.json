@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "weather-wise",
   "version": "0.1.0",
   "private": true,
@@ -35,5 +36,20 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+=======
+  "name": "mini-project-weatherapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "firebase": "^10.12.2"
+>>>>>>> 741dc79346448e58dac27ad5e50220a96e732e0e
   }
 }
