@@ -1,196 +1,119 @@
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #4e54c8, #8f94fb);
-    color: white;
-    text-align: center;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #4e54c8, #8f94fb);
+  color: white;
+  text-align: center;
+  padding: 20px;
 }
 
 #app {
-    max-width: 300px;
-    margin: 0 auto;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .current-weather {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .weather-icon {
-    width: 100px;
-    height: 100px;
+  width: 100px;
+  height: 100px;
 }
 
 .temperature {
-    font-size: 48px;
-    margin: 10px 0;
+  font-size: 48px;
+  margin: 10px 0;
 }
 
 .location,
 .temp-range {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .forecast {
-    margin-top: 200px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 10px;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .forecast-header {
-    font-size: 16px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .hourly-forecast,
 .daily-forecast {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
 .hour,
 .day {
-    text-align: center;
+  text-align: center;
 }
 
 .hour img,
 .day img {
-    width: 40px;
-    height: 40px;
+  width: 40px;
+  height: 40px;
 }
 
 .temp {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .time,
 .day-name {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 #city {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 5px;
 }
 
 #city:focus {
-    outline: none;
+  outline: none;
 }
 
 #getWeather {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    background: #4e54c8;
-    color: white;
-    cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #4e54c8;
+  color: white;
+  cursor: pointer;
 }
 
 #getWeather:hover {
-    background: #3b3f99;
+  background: #3b3f99;
 }
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #4e54c8, #8f94fb);
-    color: white;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  #app {
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  
-  .current-weather {
-    margin-top: 20px;
-  }
-  
-  .weather-icon {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .temperature {
-    font-size: 48px;
-    margin: 10px 0;
-  }
-  
-  .location,
-  .temp-range {
-    font-size: 18px;
-  }
-  
-  .forecast {
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 10px;
-  }
-  
-  .forecast-header {
-    font-size: 16px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .hourly-forecast,
-  .daily-forecast {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .hour,
-  .day {
-    text-align: center;
-  }
-  
-  .hour img,
-  .day img {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .temp {
-    font-size: 16px;
-  }
-  
-  .time,
-  .day-name {
-    font-size: 14px;
-  }
-  
-  #city {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 5px;
-  }
-  
-  #city:focus {
-    outline: none;
-  }
-  
-  #getWeather {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    background: #4e54c8;
-    color: white;
-    cursor: pointer;
-  }
-  
-  #getWeather:hover {
-    background: #3b3f99;
-  }
+
+.extra-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.extra-buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.icon-button {
+  width: 30px;
+  height: 30px;
+}
+
+.icon-button:hover {
+  transform: scale(1.1);
+}

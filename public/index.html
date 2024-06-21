@@ -11,15 +11,25 @@
         <div class="current-weather">
             <img src="\images\animated\cloudy-day-1.svg" alt="Weather Icon" class="weather-icon">
             <div class="temperature">--℉</div>
+            <div class="extra-buttons">
+                <button id="showHumidity">
+                    <img src="/images/humidity-icon.jpg" alt="Humidity Icon" class="icon-button">
+                </button>
+                <button id="showWindSpeed">
+                    <img src="/images/Windspeed.webp" alt="Wind Speed Icon" class="icon-button">
+                </button>
+            </div>
             <div class="location-container">
                 <div class="location">Locating...</div>
-                <button id="toggleUnits">℉/℃</button> <!-- Moved button inside .location-container -->
+                <button id="toggleUnits">℉/℃</button>
             </div>
             <div class="temp-range">Max: --℉ Min: --℉</div>
         </div>
         <div class="forecast">
             <div class="today-forecast">
-                <div class="forecast-header">Today <span class="date"></span></div>
+                <div class="forecast-header">
+                    Today <span class="date"></span>
+                </div>
                 <div class="hourly-forecast">
                     <div class="hour">
                         <img src="\images\animated\cloudy-day-1.svg" alt="Weather Icon">
