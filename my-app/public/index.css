@@ -117,3 +117,18 @@ body {
 .icon-button:hover {
   transform: scale(1.1);
 }
+nav-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: #4e54c8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background: #3b3f99;
+}
