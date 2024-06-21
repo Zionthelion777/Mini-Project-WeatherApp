@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5",
     "firebase": "^10.12.2"
   }
 }
