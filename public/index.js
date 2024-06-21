@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // apiKey2 = '260e557b72c4510447791a3b93ba60fb'; 
     const apiKey = '8b1f87258c77029f37948a5789d9f82a';
 
+    //fetches current weather
     function fetchWeatherData(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
 
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
+    //Fetches daily forecast 
     function fiveDayweatherForecast(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
 
@@ -157,69 +159,111 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-
-
-
-
-
+    let currentHourlyPage = 0;
+    const hoursPerPage = 5;
+    let hourlyDataCache = [];
+    
     // Fetches hourly forecast
     function fetchHourlyForecast(lat, lon) {
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
     
         fetch(apiUrl3)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.cod === "200") {
-                        renderHourlyForecast(data.list);
-                    } else {
-                        alert('Error fetching hourly forecast data. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching the hourly forecast data:', error);
-                    alert('Error fetching the hourly forecast data. Please try again later.');
-                });
-        }
-
-        function renderHourlyForecast(hourlyData) {
-            const hourlyForecastContainer = document.createElement('div');
-            hourlyForecastContainer.className = 'hourly-forecast';
-    
-            hourlyData.slice(0, 12).forEach(hour => { // Display the next 12 hours
-                const hourlyElement = document.createElement('div');
-                hourlyElement.className = 'hour';
-    
-                const timeElement = document.createElement('div');
-                timeElement.className = 'time';
-                timeElement.innerText = new Date(hour.dt * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    
-                const tempElement = document.createElement('div');
-                tempElement.className = 'temp';
-                tempElement.innerText = `${Math.round(hour.main.temp)}℉`; // Rounded temperature
-    
-                const weatherElement = document.createElement('div');
-                weatherElement.className = 'weather';
-                weatherElement.innerHTML = `<img src="http://openweathermap.org/img/wn/${hour.weather[0].icon}.png" alt="Weather icon">`;
-    
-                hourlyElement.appendChild(timeElement);
-                hourlyElement.appendChild(tempElement);
-                hourlyElement.appendChild(weatherElement);
-    
-                hourlyForecastContainer.appendChild(hourlyElement);
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    // Cache only the next 24 hours of data
+                    hourlyDataCache = data.list.slice(0, 24);
+                    currentHourlyPage = 0; // Reset to the first page
+                    renderHourlyForecast(); // Render the first 5 hours
+                } else {
+                    alert('Error fetching hourly forecast data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the hourly forecast data:', error);
+                alert('Error fetching the hourly forecast data. Please try again later.');
             });
+    }
     
-            // Clear any previous hourly forecast data
-            const existingHourlyForecast = document.querySelector('.hourly-forecast');
-            if (existingHourlyForecast) {
-                existingHourlyForecast.remove();
-            }
+    function renderHourlyForecast() {
+        const hourlyForecastList = document.querySelector('.hourly-forecast-list');
     
-            document.getElementById('app').appendChild(hourlyForecastContainer);
+        // Clear any previous hourly forecast data
+        hourlyForecastList.innerHTML = '';
+    
+        // Calculate start and end indices for the current page
+        const start = currentHourlyPage * hoursPerPage;
+        const end = start + hoursPerPage;
+        const paginatedData = hourlyDataCache.slice(start, end);
+    
+        paginatedData.forEach(hour => {
+            const hourlyElement = document.createElement('div');
+            hourlyElement.className = 'hourly';
+    
+            const timeElement = document.createElement('div');
+            timeElement.className = 'hourly-time';
+            timeElement.innerText = new Date(hour.dt * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    
+            const tempElement = document.createElement('div');
+            tempElement.className = 'hourly-temp';
+            tempElement.innerText = `${Math.round(hour.main.temp)}℉`; // Rounded temperature
+    
+            const weatherElement = document.createElement('div');
+            weatherElement.className = 'hourly-weather';
+            weatherElement.innerHTML = `<img src="http://openweathermap.org/img/wn/${hour.weather[0].icon}.png" alt="Weather icon">`;
+    
+            hourlyElement.appendChild(timeElement);
+            hourlyElement.appendChild(tempElement);
+            hourlyElement.appendChild(weatherElement);
+    
+            hourlyForecastList.appendChild(hourlyElement);
+        });
+    
+        // Update button states
+        document.getElementById('prevHours').disabled = currentHourlyPage === 0;
+        document.getElementById('nextHours').disabled = end >= hourlyDataCache.length;
+    }
+    
+    // Event listeners for navigation buttons
+    document.getElementById('prevHours').addEventListener('click', () => {
+        if (currentHourlyPage > 0) {
+            currentHourlyPage--;
+            renderHourlyForecast();
         }
-
-
-
-        
+    });
+    
+    document.getElementById('nextHours').addEventListener('click', () => {
+        if (currentHourlyPage < Math.floor(hourlyDataCache.length / hoursPerPage)) {
+            currentHourlyPage++;
+            renderHourlyForecast();
+        }
+    });
+    
+    // Event listener for the "Get Weather" button
+    document.getElementById('getWeather').addEventListener('click', () => {
+        const city = document.getElementById('city').value;
+        fetchCityCoordinates(city);
+    });
+    
+    // Fetches the coordinates of the city
+    function fetchCityCoordinates(city) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+    
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === 200) {
+                    const { lat, lon } = data.coord;
+                    fetchHourlyForecast(lat, lon);
+                } else {
+                    alert('Error fetching city coordinates. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the city coordinates:', error);
+                alert('Error fetching the city coordinates. Please try again later.');
+            });
+    }
 
     // Get current location on page load
     getCurrentLocation();
@@ -236,11 +280,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?q=${city}&appid=${apiKey}&units=imperial`;
 
+        //fetches current temp based on city input 
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === 200) {
-                    const temperature = data.main.temp;
+                    const temperature = Math.round(data.main.temp);
                     const location = data.name;
                     const maxTemp = Math.round(data.main.temp_max);
                     const minTemp = Math.round(data.main.temp_min);
@@ -258,7 +303,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the weather data. Please try again later.');
             });
 
-
+        //fetches daily temp based on city input
         fetch(apiUrl2)
             .then(resp => resp.json())
             .then(data => {
@@ -274,8 +319,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the 5-day forecast data. Please try again later.');
             });
 
-
-            fetch(apiUrl3)
+        //fetches hourly temp based on city input 
+        fetch(apiUrl3)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === "200") {

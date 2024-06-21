@@ -54,64 +54,6 @@ body {
     justify-content: space-between;
 }
 
-.hourly-forecast,
-.daily-forecast {
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 10px;
-}
-
-.hourly-forecast {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 10px;
-}
-
-.hour {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.hour:last-child {
-    border-bottom: none;
-}
-
-.hour img {
-    width: 40px;
-    height: 40px;
-}
-
-.hour .time {
-    font-size: 14px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: #FFFFFF;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.hour .temp {
-    font-size: 16px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    color: #FFDD57;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.hour .weather {
-    display: flex;
-    align-items: center;
-}
-
 .daily-forecast {
     display: flex;
     justify-content: space-around;
@@ -199,5 +141,80 @@ body {
 }
 
 #getWeather:hover {
+    background: #3b3f99;
+}
+
+.hourly-forecast {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.hourly-forecast-header {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.hourly-forecast-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.hourly {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hourly:last-child {
+    border-bottom: none;
+}
+
+.hourly-time {
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.hourly-temp {
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    color: #FFDD57;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.hourly-weather {
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    color: #FFFFFF;
+}
+
+.hourly-forecast-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.hourly-forecast-navigation button {
+    background: #4e54c8;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.hourly-forecast-navigation button:hover {
     background: #3b3f99;
 }
