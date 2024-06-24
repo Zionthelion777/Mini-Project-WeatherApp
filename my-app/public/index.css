@@ -170,20 +170,23 @@ body {
 .icon-button:hover {
   transform: scale(1.1);
 }
-nav-button {
+.nav-button {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: #4e54c8;
-  color: white;
+  top: 100px;
+  left: 500px;
+  background: none;
   border: none;
-  border-radius: 5px;
-  padding: 10px;
   cursor: pointer;
+  padding: 10px;
 }
 
-.nav-button:hover {
-  background: #3b3f99;
+.nav-button img {
+  width: 40px;
+  height: 40px;
+}
+
+.nav-button:hover img {
+  transform: scale(1.1);
 }
 
 .hourly-forecast {

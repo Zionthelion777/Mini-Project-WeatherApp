@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const query = input.value.trim();
 
             if (query.length > 0) {
-                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=imperial`;
+                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=${currentUnits}`;
 
                 fetch(apiUrl)
                     .then(resp => resp.json())
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     
     // Fetches hourly forecast
     function fetchHourlyForecast(lat, lon) {
-        const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+        const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
     
         fetch(apiUrl3)
             .then(response => response.json())
@@ -399,10 +399,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById('tempMapButton').addEventListener('click', function() {
         window.location.href = 'temperature.html';
     });
-     // Handle click event for the Back to Home button
-    document.getElementById('backHomeButton').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+    
 
     // Get current location on page load
     getCurrentLocation();

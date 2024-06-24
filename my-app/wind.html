@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wind Map</title>
     <link rel="stylesheet" href="node_modules/ol/ol.css">
+    <button id="backHomeButton" class="back-button">Back to Home</button>
+        </div>
     <style>
              /* Additional styles for the new layout */
              body {
@@ -13,6 +15,9 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #3E2D8F, #9D52AC);
+  color: white;
         }
 
         #app {
@@ -96,6 +101,22 @@
       #map:focus {
         outline: #4A74A8 solid 0.15em;
       }
+       /* New styles for the back button */
+       .back-button {
+            position: absolute;
+            top: 39px;
+            right: 450px;
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: #3b3f99;
+        }
     </style>
   </head>
   <body>
