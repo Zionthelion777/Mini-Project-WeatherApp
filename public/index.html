@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <div id="app">
@@ -26,7 +27,7 @@
 
         <div class="forecast">
             <div class="seven-days-forecast">
-                <div class="forecast-header">7-Day Forecast</div>
+                <div class="forecast-header">7-Days Forecast</div>
                 <div class="daily-forecast">
                     <div class="day">
                         <img src="placeholder-weather-icon.png" alt="Weather Icon">
@@ -37,12 +38,11 @@
                 </div>
             </div>
         </div>
-
+    </div>
+    <div class="sticky-container">
         <input type="text" id="city" placeholder="Enter city name" autocomplete="off">
         <div id="suggestions"></div>
-        <div>
-            <button id="getWeather">Get Weather</button>
-        </div>
+        <button id="getWeather">Get Weather</button>
     </div>
     <script src="index.js"></script>
 </body>

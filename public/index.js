@@ -327,6 +327,56 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
+    //fetches news
+    fetchNewsData();
+
+    // Function to fetch news data
+    function fetchNewsData() {
+        const newsApiKey = '4a6195c720414a1ab7f0068f947f8853';
+        const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    renderNewsData(data.articles);
+                } else {
+                    alert('Error fetching news data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the news data:', error);
+                alert('Error fetching the news data. Please try again later.');
+            });
+    }
+
+    // Function to render news data
+    function renderNewsData(articles) {
+        const newsContainer = document.querySelector('.news-container') || document.createElement('div');
+        newsContainer.className = 'news-container';
+        newsContainer.innerHTML = ''; // Clear any previous data
+
+        articles.forEach(article => {
+            const articleElement = document.createElement('div');
+            articleElement.className = 'article';
+
+            articleElement.innerHTML = `
+                <img src="${article.urlToImage}" alt="News Image" class="news-image">
+                <div class="news-title">${article.title}</div>
+                <div class="news-author">${article.author ? 'By ' + article.author : ''}</div>
+                <div class="news-description">${article.description}</div>
+                <a href="${article.url}" target="_blank" class="news-link">Read more</a>
+            `;
+
+            newsContainer.appendChild(articleElement);
+        });
+
+        // Append the news container to the body if it's not already there
+        if (!document.querySelector('.news-container')) {
+            document.body.appendChild(newsContainer);
+        }
+    }
+
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;

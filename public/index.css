@@ -11,9 +11,12 @@ body {
 }
 
 #app {
-    max-width: 300px;
+    max-width: 800px; /* Increased to accommodate side-by-side layout */
     margin: 0 auto;
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Space between the columns */
 }
 
 .current-weather {
@@ -23,6 +26,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s;
+    width: 100%; /* Full width for current weather */
 }
 
 .current-weather:hover {
@@ -50,24 +54,36 @@ body {
     font-weight: 700;
 }
 
-.forecast {
+.forecast,
+.hourly-forecast {
     margin-top: 20px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s;
+    flex: 1;
+    margin-right: 10px; /* Add some space between columns */
+    width: calc(50% - 10px); /* Adjust width to fit two columns */
 }
 
-.forecast:hover {
+.forecast:hover,
+.hourly-forecast:hover {
     transform: translateY(-5px);
 }
 
-.forecast-header {
+.forecast-header,
+.hourly-forecast-header {
     font-size: 16px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #FFDD57;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .daily-forecast {
@@ -160,48 +176,21 @@ body {
 }
 
 #getWeather {
-    width: 200px; /* Adjust width as needed */
-    padding: 15px;
-    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
     border: none;
-    border-radius: 30px;
+    border-radius: 5px;
     background: #4e54c8;
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: background 0.3s, transform 0.3s;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
 }
 
 #getWeather:hover {
     background: #3b3f99;
     transform: translateY(-3px);
-}
-
-.hourly-forecast {
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s;
-}
-
-.hourly-forecast:hover {
-    transform: translateY(-5px);
-}
-
-.hourly-forecast-header {
-    font-size: 16px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
 }
 
 .hourly-forecast-list {
@@ -271,7 +260,7 @@ body {
 .additional-data {
     position: absolute;
     top: 20px;
-    right: 20px; /* Adjust to 'left' if you want it on the left side */
+    left: 20px; /* Adjust to 'left' if you want it on the left side */
     font-size: 14px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
@@ -324,4 +313,101 @@ body {
     font-weight: 700;
     pointer-events: none;
     z-index: 1000;
+}
+
+/* News Widget */
+.news-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    text-align: left;
+    z-index: 1000;
+    transition: transform 0.3s;
+}
+
+.news-container:hover {
+    transform: translateY(-5px);
+}
+
+.article {
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+
+.article:hover {
+    transform: translateY(-5px);
+}
+
+.news-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.news-title {
+    font-size: 18px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #FFDD57;
+    margin-bottom: 5px;
+}
+
+.news-author {
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.news-description {
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.news-link {
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: #4e54c8;
+    text-decoration: none;
+}
+
+.news-link:hover {
+    text-decoration: underline;
+}
+
+/* Navigation Buttons */
+.news-navigation {
+    position: fixed;
+    top: 400px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+}
+
+.news-navigation button {
+    width: 48%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #4e54c8;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s, transform 0.3s;
+}
+
+
+.news-navigation button:disabled {
+    background: #777;
+    cursor: not-allowed;
 }
