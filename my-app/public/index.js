@@ -1,30 +1,24 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-    const apiKey = '8b1f87258c77029f37948a5789d9f82a'; // Replace with your OpenWeatherMap API key
-    let currentUnits = 'imperial';
-    let currentWeatherData = null; // Store current weather data here
-    let currentCity = ''; // Store the current city name
-    let currentCoords = null; // Store the current coordinates (lat, lon)
+    const apiKey = '8b1f87258c77029f37948a5789d9f82a';
 
     //fetches current weather
     function fetchWeatherData(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
 
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === 200) {
-                    currentWeatherData = data; // Store the data for later use
                     const weatherDescription = data.weather[0].description;
                     const temperature = Math.round(data.main.temp);
                     const location = data.name;
                     const maxTemp = Math.round(data.main.temp_max);
                     const minTemp = Math.round(data.main.temp_min);
 
-                    const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
-
-                    document.querySelector('.temperature').innerHTML = `${temperature}${tempUnit}`;
+                    document.querySelector('.temperature').innerHTML = `${temperature}℉`;
                     document.querySelector('.location').innerHTML = location;
-                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}${tempUnit} Min: ${minTemp}${tempUnit}`;
+                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}℉ Min: ${minTemp}℉`;
+
                 } else {
                     alert('Error fetching weather data. Please try again.');
                 }
@@ -40,7 +34,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial&cnt=7`;
 
         fetch(apiUrl)
-            .then(response => response.json())
+            .then(resp => resp.json())
             .then(data => {
                 if (data.cod === "200") {
                     drawWeather(data);
@@ -64,58 +58,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const date = new Date(forecast.dt * 1000);
             const day = date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
 
-            if (!dailyForecasts[day]) {
-                dailyForecasts[day] = {
-                    maxTemp: Math.round(forecast.main.temp),
-                    icon: forecast.weather[0].icon
-                };
-            } else {
-                if (forecast.main.temp > dailyForecasts[day].maxTemp) {
-                    dailyForecasts[day].maxTemp = Math.round(forecast.main.temp);
-                    dailyForecasts[day].icon = forecast.weather[0].icon;
-                }
-            }
-        });
-        const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
-
-
-        // Display the daily forecasts
-        Object.keys(dailyForecasts).forEach(day => {
-            const forecast = dailyForecasts[day];
-
             const dayElement = document.createElement('div');
             dayElement.classList.add('day');
 
             dayElement.innerHTML = `
                 <div class="day-name">${day}</div>
-                <img src="http://openweathermap.org/img/wn/${forecast.icon}.png" alt="Weather icon">
-                <div class="temp">${forecast.maxTemp}${tempUnit}</div>
-            `;
-            /*
-            <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
+                <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
                 <div class="temp">${Math.round(forecast.temp.day)}℉</div>
             `;
-            */
+
             dailyForecastContainer.appendChild(dayElement);
         });
     }
+
     // Function to get current location
-    
     function getCurrentLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
-                fetchFiveDayForecast(lat, lon);
                 fetchHourlyForecast(lat, lon);
                 sevenDayWeatherForecast(lat, lon);
                 fetchAdditionalData(lat,lon);
 
-
-                // Update current coordinates and clear city
-                currentCoords = { lat, lon };
-                currentCity = '';
             }, (error) => {
                 console.error('Error getting location:', error);
                 alert('Error getting location. Please enter the city manually.');
@@ -362,46 +328,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     // Fetch weather data based on city input
-    document.getElementById('getWeather').addEventListener('click', function () {
+    document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
-        fetchWeatherDataByCity(city);
-    });
-
-    // Toggle units between Celsius and Fahrenheit
-    document.getElementById('toggleUnits').addEventListener('click', function() {
-        currentUnits = currentUnits === 'imperial' ? 'metric' : 'imperial';
-        const buttonText = currentUnits === 'imperial' ? '°C/°F' : '°F/°C';
-        this.innerHTML = buttonText;
-
-        // Update the weather data using the new units
-        if (currentCoords) {
-            fetchWeatherData(currentCoords.lat, currentCoords.lon);
-            fetchFiveDayForecast(currentCoords.lat, currentCoords.lon);
-        } else if (currentCity) {
-            fetchWeatherDataByCity(currentCity);
-        }
-    });
-
-    // Show humidity data
-    document.getElementById('showHumidity').addEventListener('click', function() {
-        if (currentWeatherData && currentWeatherData.main && typeof currentWeatherData.main.humidity !== 'undefined') {
-            alert('Current Humidity: ' + currentWeatherData.main.humidity + '%');
-        } else {
-            alert('Humidity data not available.');
-        }
-    });
-    // Handle click event for the Temperature Map button
-    document.getElementById('tempMapButton').addEventListener('click', function() {
-        window.location.href = 'temperature.html';
-    });
-    // Get current location on page load
-    getCurrentLocation();
-});
-
-document.getElementById('getWeather').addEventListener('click', function() {
-//const apiKey = '8b1f87258c77029f37948a5789d9f82a'; 
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
-        const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiKey = '8b1f87258c77029f37948a5789d9f82a'; 
+        const apiUrl =  `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast/daily?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl4 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
 
@@ -474,4 +405,33 @@ document.getElementById('getWeather').addEventListener('click', function() {
                 console.error('Error fetching the additional data:', error);
                 alert('Error fetching the additional data. Please try again later.');
             });
-        });
+
+    });
+    // Toggle units between Celsius and Fahrenheit
+    document.getElementById('toggleUnits').addEventListener('click', function() {
+        currentUnits = currentUnits === 'imperial' ? 'metric' : 'imperial';
+        const buttonText = currentUnits === 'imperial' ? '°C/°F' : '°F/°C';
+        this.innerHTML = buttonText;
+
+        // Update the weather data using the new units
+        if (currentCoords) {
+            fetchWeatherData(currentCoords.lat, currentCoords.lon);
+            fetchFiveDayForecast(currentCoords.lat, currentCoords.lon);
+        } else if (currentCity) {
+            fetchWeatherDataByCity(currentCity);
+        }
+    });
+
+    // Show humidity data
+    document.getElementById('showHumidity').addEventListener('click', function() {
+        if (currentWeatherData && currentWeatherData.main && typeof currentWeatherData.main.humidity !== 'undefined') {
+            alert('Current Humidity: ' + currentWeatherData.main.humidity + '%');
+        } else {
+            alert('Humidity data not available.');
+        }
+    });
+    // Handle click event for the Temperature Map button
+    document.getElementById('tempMapButton').addEventListener('click', function() {
+        window.location.href = 'temperature.html';
+    });
+  });
