@@ -35,81 +35,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
-    function fetchWeatherDataByCity(city) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${currentUnits}`;
-        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${currentUnits}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === 200) {
-                    currentWeatherData = data; // Store the data for later use
-                    const weatherDescription = data.weather[0].description;
-                    const temperature = Math.round(data.main.temp);
-                    const location = data.name;
-                    const maxTemp = Math.round(data.main.temp_max);
-                    const minTemp = Math.round(data.main.temp_min);
-
-                    const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
-
-                    document.querySelector('.temperature').innerHTML = `${temperature}${tempUnit}`;
-                    document.querySelector('.location').innerHTML = location;
-                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}${tempUnit} Min: ${minTemp}${tempUnit}`;
-
-                    // Update current city and clear coordinates
-                    currentCity = city;
-                    currentCoords = null;
-
-                    // Fetch 5-day forecast
-                    fetchFiveDayForecastByCity(city);
-                } else {
-                    alert('City not found. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the weather data:', error);
-                alert('Error fetching the weather data. Please try again later.');
-            });
-    }
-
     function fetchFiveDayForecast(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    drawWeather(data);
-                } else {
-                    alert('Error fetching 5-day forecast data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the 5-day forecast data:', error);
-                alert('Error fetching the 5-day forecast data. Please try again later.');
-            });
-    }
-    //Fetches daily forecast 
-    function fetchFiveDayForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    drawWeather(data);
-                } else {
-                    alert('Error fetching 5-day forecast data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the 5-day forecast data:', error);
-                alert('Error fetching the 5-day forecast data. Please try again later.');
-            });
-    }
-
-    function fetchFiveDayForecastByCity(city) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${currentUnits}`;
 
         fetch(apiUrl)
             .then(response => response.json())
@@ -470,6 +397,8 @@ document.getElementById('getWeather').addEventListener('click', function() {
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl4 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
+
 
         //fetches current temp based on city input 
         fetch(apiUrl)
@@ -525,7 +454,7 @@ document.getElementById('getWeather').addEventListener('click', function() {
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
 
-            fetch(apiUrl)
+            fetch(apiUrl4)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === "200") {
