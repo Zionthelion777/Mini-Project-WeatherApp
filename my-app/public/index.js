@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', (event) => {
     const apiKey = '8b1f87258c77029f37948a5789d9f82a'; // Replace with your OpenWeatherMap API key
     let currentUnits = 'imperial';
@@ -36,6 +35,60 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
+    function fetchWeatherDataByCity(city) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${currentUnits}`;
+        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${currentUnits}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === 200) {
+                    currentWeatherData = data; // Store the data for later use
+                    const weatherDescription = data.weather[0].description;
+                    const temperature = Math.round(data.main.temp);
+                    const location = data.name;
+                    const maxTemp = Math.round(data.main.temp_max);
+                    const minTemp = Math.round(data.main.temp_min);
+
+                    const tempUnit = currentUnits === 'imperial' ? '℉' : '℃';
+
+                    document.querySelector('.temperature').innerHTML = `${temperature}${tempUnit}`;
+                    document.querySelector('.location').innerHTML = location;
+                    document.querySelector('.temp-range').innerHTML = `Max: ${maxTemp}${tempUnit} Min: ${minTemp}${tempUnit}`;
+
+                    // Update current city and clear coordinates
+                    currentCity = city;
+                    currentCoords = null;
+
+                    // Fetch 5-day forecast
+                    fetchFiveDayForecastByCity(city);
+                } else {
+                    alert('City not found. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the weather data:', error);
+                alert('Error fetching the weather data. Please try again later.');
+            });
+    }
+
+    function fetchFiveDayForecast(lat, lon) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    drawWeather(data);
+                } else {
+                    alert('Error fetching 5-day forecast data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the 5-day forecast data:', error);
+                alert('Error fetching the 5-day forecast data. Please try again later.');
+            });
+    }
     //Fetches daily forecast 
     function fetchFiveDayForecast(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
@@ -70,42 +123,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .catch(error => {
                 console.error('Error fetching the 5-day forecast data:', error);
                 alert('Error fetching the 5-day forecast data. Please try again later.');
-            });
-    }
-    //Fetches daily forecast 
-    function fetchFiveDayForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    drawWeather(data);
-                } else {
-                    alert('Error fetching 6-day forecast data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the 6-day forecast data:', error);
-                alert('Error fetching the 6-day forecast data. Please try again later.');
-            });
-    }
-
-    function fetchFiveDayForecastByCity(city) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${currentUnits}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    drawWeather(data);
-                } else {
-                    alert('Error fetching 6-day forecast data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the 6-day forecast data:', error);
-                alert('Error fetching the 6-day forecast data. Please try again later.');
             });
     }
 
@@ -162,8 +179,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 fetchWeatherData(lat, lon);
                 fetchFiveDayForecast(lat, lon);
                 fetchHourlyForecast(lat, lon);
-                fiveDayweatherForecast(lat, lon);
                 fetchAdditionalData(lat,lon);
+
 
                 // Update current coordinates and clear city
                 currentCoords = { lat, lon };
@@ -177,9 +194,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    // Get current location on page load
-    getCurrentLocation();
-
     // Autocomplete function for city names
     function autocompleteCityName() {
         const input = document.getElementById('city');
@@ -189,7 +203,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const query = input.value.trim();
 
             if (query.length > 0) {
-                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=${currentUnits}`;
+                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=imperial`;
 
                 fetch(apiUrl)
                     .then(resp => resp.json())
@@ -233,7 +247,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     
     // Fetches hourly forecast
     function fetchHourlyForecast(lat, lon) {
-        const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnits}`;
+        const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
     
         fetch(apiUrl3)
             .then(response => response.json())
@@ -313,7 +327,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         fetchCityCoordinates(city);
     });
     
-    
     // Fetches the coordinates of the city
     function fetchCityCoordinates(city) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
@@ -340,80 +353,80 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize city name autocomplete
     autocompleteCityName();
 
-    // Function to fetch additional weather data
-    function fetchAdditionalData(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    const additionalData = data.list[0];
-                    renderAdditionalData(additionalData);
-                } else {
-                    alert('Error fetching additional data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the additional data:', error);
-                alert('Error fetching the additional data. Please try again later.');
-            });
-    }
-
-    function renderAdditionalData(data) {
-        const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
-        additionalDataContainer.className = 'additional-data';
+        // Function to fetch additional weather data
+        function fetchAdditionalData(lat, lon) {
+            const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
     
-        additionalDataContainer.innerHTML = `
-            <div class="data-item" data-info="Cloudiness: ${data.clouds?.all ?? 'N/A'}%">
-                <i class="fas fa-cloud"></i>
-            </div>
-            <div class="data-item" data-info="Wind Speed: ${data.wind?.speed ?? 'N/A'} mph">
-                <i class="fas fa-wind"></i>
-            </div>
-            <div class="data-item" data-info="Wind Direction: ${data.wind?.deg ?? 'N/A'}°">
-                <i class="fas fa-compass"></i>
-            </div>
-            <div class="data-item" data-info="Wind Gust: ${data.wind?.gust ?? 'N/A'} mph">
-                <i class="fas fa-wind"></i>
-            </div>
-            <div class="data-item" data-info="Rain Volume: ${data.rain?.['1h'] ?? 0} mm">
-                <i class="fas fa-cloud-showers-heavy"></i>
-            </div>
-            <div class="data-item" data-info="Snow Volume: ${data.snow?.['1h'] ?? 0} mm">
-                <i class="fas fa-snowflake"></i>
-            </div>
-            <div class="data-item" data-info="Visibility: ${data.visibility ?? 'N/A'} meters">
-                <i class="fas fa-eye"></i>
-            </div>
-            <div class="data-item" data-info="Precipitation Probability: ${data.pop ? data.pop * 100 : 'N/A'}%">
-                <i class="fas fa-tint"></i>
-            </div>
-        `;
-    
-        // Append the additional data container to the body if it's not already there
-        if (!document.querySelector('.additional-data')) {
-            document.body.appendChild(additionalDataContainer);
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod === "200") {
+                        const additionalData = data.list[0];
+                        renderAdditionalData(additionalData);
+                    } else {
+                        alert('Error fetching additional data. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching the additional data:', error);
+                    alert('Error fetching the additional data. Please try again later.');
+                });
         }
     
-        // Add event listeners for hover effect
-        document.querySelectorAll('.data-item').forEach(item => {
-            item.addEventListener('mouseenter', (event) => {
-                const infoBox = document.createElement('div');
-                infoBox.className = 'info-box';
-                infoBox.innerText = event.currentTarget.getAttribute('data-info');
-                document.body.appendChild(infoBox);
-    
-                const rect = event.currentTarget.getBoundingClientRect();
-                infoBox.style.left = `${rect.left + window.scrollX}px`;
-                infoBox.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        function renderAdditionalData(data) {
+            const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
+            additionalDataContainer.className = 'additional-data';
+        
+            additionalDataContainer.innerHTML = `
+                <div class="data-item" data-info="Cloudiness: ${data.clouds?.all ?? 'N/A'}%">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="data-item" data-info="Wind Speed: ${data.wind?.speed ?? 'N/A'} mph">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div class="data-item" data-info="Wind Direction: ${data.wind?.deg ?? 'N/A'}°">
+                    <i class="fas fa-compass"></i>
+                </div>
+                <div class="data-item" data-info="Wind Gust: ${data.wind?.gust ?? 'N/A'} mph">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div class="data-item" data-info="Rain Volume: ${data.rain?.['1h'] ?? 0} mm">
+                    <i class="fas fa-cloud-showers-heavy"></i>
+                </div>
+                <div class="data-item" data-info="Snow Volume: ${data.snow?.['1h'] ?? 0} mm">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <div class="data-item" data-info="Visibility: ${data.visibility ?? 'N/A'} meters">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="data-item" data-info="Precipitation Probability: ${data.pop ? data.pop * 100 : 'N/A'}%">
+                    <i class="fas fa-tint"></i>
+                </div>
+            `;
+        
+            // Append the additional data container to the body if it's not already there
+            if (!document.querySelector('.additional-data')) {
+                document.body.appendChild(additionalDataContainer);
+            }
+        
+            // Add event listeners for hover effect
+            document.querySelectorAll('.data-item').forEach(item => {
+                item.addEventListener('mouseenter', (event) => {
+                    const infoBox = document.createElement('div');
+                    infoBox.className = 'info-box';
+                    infoBox.innerText = event.currentTarget.getAttribute('data-info');
+                    document.body.appendChild(infoBox);
+        
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    infoBox.style.left = `${rect.left + window.scrollX}px`;
+                    infoBox.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                });
+        
+                item.addEventListener('mouseleave', () => {
+                    document.querySelector('.info-box').remove();
+                });
             });
-    
-            item.addEventListener('mouseleave', () => {
-                document.querySelector('.info-box').remove();
-            });
-        });
-    }
+        }    
 
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function () {
@@ -444,27 +457,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
             alert('Humidity data not available.');
         }
     });
-
-    // Show wind speed data
-    document.getElementById('showWindSpeed').addEventListener('click', function() {
-        if (currentWeatherData && currentWeatherData.wind && typeof currentWeatherData.wind.speed !== 'undefined') {
-            const windSpeedUnit = currentUnits === 'imperial' ? 'mph' : 'm/s';
-            alert('Current Wind Speed: ' + currentWeatherData.wind.speed + ' ' + windSpeedUnit);
-        } else {
-            alert('Wind speed data not available.');
-        }
-    });
     // Handle click event for the Temperature Map button
     document.getElementById('tempMapButton').addEventListener('click', function() {
         window.location.href = 'temperature.html';
     });
-    
-
     // Get current location on page load
     getCurrentLocation();
 });
 
-
+document.getElementById('getWeather').addEventListener('click', function() {
 //const apiKey = '8b1f87258c77029f37948a5789d9f82a'; 
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
@@ -524,8 +525,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
 
-       /* 
-        fetch(apiUrl2)
+            fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === "200") {
@@ -539,7 +539,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 console.error('Error fetching the additional data:', error);
                 alert('Error fetching the additional data. Please try again later.');
             });
-
-    });
-  });
-  */
+        });
