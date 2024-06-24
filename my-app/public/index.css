@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500&display=swap');
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #4e54c8, #8f94fb);
-    color: white;
-    text-align: center;
-    padding: 20px;
-    position: relative;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #3E2D8F, #9D52AC);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  position: relative;
 }
 
 #app {
@@ -163,8 +163,8 @@ body {
 }
 
 .icon-button {
-  width: 30px;
-  height: 30px;
+  width: 60px;
+  height: 60px;
 }
 
 .icon-button:hover {
