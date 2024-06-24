@@ -430,8 +430,36 @@ document.addEventListener('DOMContentLoaded', (event) => {
             alert('Humidity data not available.');
         }
     });
+
+    // Show wind speed data
+    document.getElementById('showWindSpeed').addEventListener('click', function() {
+        if (currentWeatherData && currentWeatherData.wind && typeof currentWeatherData.wind.speed !== 'undefined') {
+            const windSpeedUnit = currentUnits === 'imperial' ? 'mph' : 'm/s';
+            alert('Current Wind Speed: ' + currentWeatherData.wind.speed + ' ' + windSpeedUnit);
+        } else {
+            alert('Wind speed data not available.');
+        }
+    });
+
+
+    // Handle click event for the Animated Map Button
+    document.getElementById('animatedMapButton').addEventListener('click', function() {
+        window.location.href = 'animatedMap.html';
+    });
+    
     // Handle click event for the Temperature Map button
     document.getElementById('tempMapButton').addEventListener('click', function() {
         window.location.href = 'temperature.html';
     });
-  });
+     // Handle click event for the Back to Home button
+     document.getElementById('backHomeButton').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });     
+    
+    
+
+    // Get current location on page load
+    getCurrentLocation();
+
+    
+});
