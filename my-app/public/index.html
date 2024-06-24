@@ -27,20 +27,26 @@
         </div>
         <div class="forecast">
             <div class="today-forecast">
-                <div class="forecast-header">
-                    Today <span class="date"></span>
-                </div>
+                <div class="forecast-header">Today <span class="date"></span></div>
                 <div class="hourly-forecast">
                     <div class="hour">
-                        <img src="\images\animated\cloudy-day-1.svg" alt="Weather Icon">
+                        <img src="placeholder-weather-icon.png" alt="Weather Icon">
+                        <div class="hourly-forecast-header">Hourly Forecast</div>
+            <div class="hourly-forecast-list"></div>
+            <div class="hourly-forecast-navigation">
+                <button id="prevHours">Previous</button>
+                <button id="nextHours">Next</button>
                         <div class="temp">--℉</div>
                         <div class="time">--:--</div>
                     </div>
                     <!-- Additional hourly forecast elements will be added dynamically -->
                 </div>
             </div>
+        </div>
+
+        <div class="forecast">
             <div class="seven-days-forecast">
-                <div class="forecast-header">7-Days Forecasts</div>
+                <div class="forecast-header">7-Days Forecast</div>
                 <div class="daily-forecast">
                     <div class="day">
                         <img src="\images\animated\cloudy-day-1.svg" alt="Weather Icon">
@@ -51,8 +57,14 @@
                 </div>
             </div>
         </div>
-        <input type="text" id="city" placeholder="Enter city name">
-        <button id="getWeather">Get Weather</button>
+
+        <input type="text" id="city" placeholder="Enter city name" autocomplete="off">
+        <div id="suggestions"></div>
+        <div>
+            <button id="getWeather">Get Weather</button>
+        </div>
+    </div>
+    <button id="tempMapButton" class="nav-button">Temperature Map</button>
     </div>
     <button id="tempMapButton" class="nav-button">Temperature Map</button>
     </div>
