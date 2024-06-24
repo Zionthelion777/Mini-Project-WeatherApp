@@ -15,7 +15,6 @@
                 <button id="showHumidity">
                     <img src="\images\humidity-icon.jpg" alt="Humidity Icon" class="icon-button">
                 </button>
-            
             </div>
             <div class="location-container">
                 <div class="location">Locating...</div>
@@ -30,12 +29,13 @@
                     <div class="hour">
                         <img src="placeholder-weather-icon.png" alt="Weather Icon">
                         <div class="hourly-forecast-header">Hourly Forecast</div>
-            <div class="hourly-forecast-list"></div>
-            <div class="hourly-forecast-navigation">
-                <button id="prevHours">Previous</button>
-                <button id="nextHours">Next</button>
+                        <div class="hourly-forecast-list"></div>
+                        <div class="hourly-forecast-navigation">
+                            <button id="prevHours">Previous</button>
+                            <button id="nextHours">Next</button>
+                        </div>
+                        <!-- Additional hourly forecast elements will be added dynamically -->
                     </div>
-                    <!-- Additional hourly forecast elements will be added dynamically -->
                 </div>
             </div>
         </div>
@@ -53,11 +53,16 @@
                 </div>
             </div>
         </div>
-        <input type="text" id="city" placeholder="Enter city name">
-        <button id="getWeather">Get Weather</button>
-    </div>
-    <button id="tempMapButton" class="nav-button">Temperature Map</button>
-    <button id="animatedMapButton" class="nav-button">Animated Map</button>
+
+        <input type="text" id="city" placeholder="Enter city name" autocomplete="off">
+        <div id="suggestions"></div>
+        <div>
+            <button id="getWeather">Get Weather</button>
+        </div>
+        <button id="tempMapButton" class="nav-button">
+            <img src="\images\Location.png" alt="Location Icon">
+        </button>
+        <button id="animatedMapButton" class="navi-button">Animated Map</button>
     </div>
     <script src="index.js"></script>
 </body>

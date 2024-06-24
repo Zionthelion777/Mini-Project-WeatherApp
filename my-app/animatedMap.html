@@ -9,6 +9,8 @@
   <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
   <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet" />
   <script src="https://cdn.maptiler.com/maptiler-weather/v2.0.0/maptiler-weather.umd.min.js"></script>
+  <button id="backHomeButton" class="back-button">Back to Home</button>
+        </div>
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
@@ -19,6 +21,23 @@
     #time-slider{ width: 100%; height: fit-content; left: 0; right: 0; z-index: 1; filter: drop-shadow(0 0 7px #000a); margin-top: 10px;}
     #buttons{ width: auto; margin: 0 10px; padding:0; position:absolute; top: 50px; left:0; z-index:99;}
     .button{ display: block; position: relative; margin: 10px 0 0 0; font-size: 0.9em; background-color: antiquewhite;}
+    /* New styles for the back button */
+    .back-button {
+            position: fixed; /* Changed to fixed */
+            top: 100px;
+            right: 250px;
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        .back-button:hover {
+            background: #3b3f99;
+        }
   </style>
 </head>
 <body>
@@ -95,6 +114,10 @@
           weatherLayer.setAnimationTime(parseInt(timeSlider.value / 1000));
         }
       });
+        // Handle click event for the Back to Home button
+ document.getElementById('backHomeButton').addEventListener('click', function() {
+  window.location.href = 'index.html';
+});
 
       // When clicking on the play/pause
       playPauseButton.addEventListener("click", () => {

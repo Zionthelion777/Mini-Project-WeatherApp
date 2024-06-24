@@ -320,3 +320,18 @@ body {
   pointer-events: none;
   z-index: 1000;
 }
+.navi-button {
+  position: absolute;
+  top: 200px;
+  left: 500px;
+  background: #4e54c8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background: #3b3f99;
+}
