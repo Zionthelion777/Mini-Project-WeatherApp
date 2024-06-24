@@ -1,6 +1,5 @@
+
 document.addEventListener('DOMContentLoaded', (event) => {
-    // Function to fetch weather data
-    // apiKey2 = '260e557b72c4510447791a3b93ba60fb'; 
     const apiKey = '8b1f87258c77029f37948a5789d9f82a';
 
     //fetches current weather
@@ -42,12 +41,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     console.log('--->'+(JSON.stringify(data)));
                     drawWeather(data);
                 } else {
-                    alert('Error fetching 5-day forecast data. Please try again.');
+                    alert('Error fetching 6-day forecast data. Please try again.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching the 5-day forecast data:', error);
-                alert('Error fetching the 5-day forecast data. Please try again later.');
+                console.error('Error fetching the 6-day forecast data:', error);
+                alert('Error fetching the 6-day forecast data. Please try again later.');
             });
     }
 
@@ -102,6 +101,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 fetchWeatherData(lat, lon);
                 fetchHourlyForecast(lat, lon);
                 fiveDayweatherForecast(lat, lon);
+                fetchAdditionalData(lat,lon);
 
             }, (error) => {
                 console.error('Error getting location:', error);
@@ -245,6 +245,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         fetchCityCoordinates(city);
     });
     
+    
     // Fetches the coordinates of the city
     function fetchCityCoordinates(city) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
@@ -271,13 +272,87 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize city name autocomplete
     autocompleteCityName();
 
+    // Function to fetch additional weather data
+    function fetchAdditionalData(lat, lon) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    const additionalData = data.list[0];
+                    renderAdditionalData(additionalData);
+                } else {
+                    alert('Error fetching additional data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the additional data:', error);
+                alert('Error fetching the additional data. Please try again later.');
+            });
+    }
+
+    function renderAdditionalData(data) {
+        const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
+        additionalDataContainer.className = 'additional-data';
+    
+        additionalDataContainer.innerHTML = `
+            <div class="data-item" data-info="Cloudiness: ${data.clouds?.all ?? 'N/A'}%">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <div class="data-item" data-info="Wind Speed: ${data.wind?.speed ?? 'N/A'} mph">
+                <i class="fas fa-wind"></i>
+            </div>
+            <div class="data-item" data-info="Wind Direction: ${data.wind?.deg ?? 'N/A'}°">
+                <i class="fas fa-compass"></i>
+            </div>
+            <div class="data-item" data-info="Wind Gust: ${data.wind?.gust ?? 'N/A'} mph">
+                <i class="fas fa-wind"></i>
+            </div>
+            <div class="data-item" data-info="Rain Volume: ${data.rain?.['1h'] ?? 0} mm">
+                <i class="fas fa-cloud-showers-heavy"></i>
+            </div>
+            <div class="data-item" data-info="Snow Volume: ${data.snow?.['1h'] ?? 0} mm">
+                <i class="fas fa-snowflake"></i>
+            </div>
+            <div class="data-item" data-info="Visibility: ${data.visibility ?? 'N/A'} meters">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="data-item" data-info="Precipitation Probability: ${data.pop ? data.pop * 100 : 'N/A'}%">
+                <i class="fas fa-tint"></i>
+            </div>
+        `;
+    
+        // Append the additional data container to the body if it's not already there
+        if (!document.querySelector('.additional-data')) {
+            document.body.appendChild(additionalDataContainer);
+        }
+    
+        // Add event listeners for hover effect
+        document.querySelectorAll('.data-item').forEach(item => {
+            item.addEventListener('mouseenter', (event) => {
+                const infoBox = document.createElement('div');
+                infoBox.className = 'info-box';
+                infoBox.innerText = event.currentTarget.getAttribute('data-info');
+                document.body.appendChild(infoBox);
+    
+                const rect = event.currentTarget.getBoundingClientRect();
+                infoBox.style.left = `${rect.left + window.scrollX}px`;
+                infoBox.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            });
+    
+            item.addEventListener('mouseleave', () => {
+                document.querySelector('.info-box').remove();
+            });
+        });
+    }
 
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
         const apiKey = '8b1f87258c77029f37948a5789d9f82a'; 
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
-        const apiUrl2 =`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl =  `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?q=${city}&appid=${apiKey}&units=imperial`;
 
         //fetches current temp based on city input 
@@ -333,5 +408,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 console.error('Error fetching the hourly forecast data:', error);
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
-        });
+
+        
+        fetch(apiUrl2)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    const additionalData = data.list[0];
+                    renderAdditionalData(additionalData);
+                } else {
+                    alert('Error fetching additional data. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching the additional data:', error);
+                alert('Error fetching the additional data. Please try again later.');
+            });
+
+    });
   });
