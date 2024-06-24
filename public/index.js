@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', (event) => {
     const apiKey = '8b1f87258c77029f37948a5789d9f82a';
 
@@ -244,7 +243,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const city = document.getElementById('city').value;
         fetchCityCoordinates(city);
     });
-    
     
     // Fetches the coordinates of the city
     function fetchCityCoordinates(city) {
