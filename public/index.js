@@ -30,22 +30,21 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     //Fetches daily forecast 
-    function fiveDayweatherForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+    function sevenDayWeatherForecast(lat, lon) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial&cnt=7`;
 
         fetch(apiUrl)
             .then(resp => resp.json())
             .then(data => {
                 if (data.cod === "200") {
-                    console.log('--->'+(JSON.stringify(data)));
                     drawWeather(data);
                 } else {
-                    alert('Error fetching 6-day forecast data. Please try again.');
+                    alert('Error fetching 7-day forecast data. Please try again.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching the 6-day forecast data:', error);
-                alert('Error fetching the 6-day forecast data. Please try again later.');
+                console.error('Error fetching the 7-day forecast data:', error);
+                alert('Error fetching the 7-day forecast data. Please try again later.');
             });
     }
 
@@ -54,37 +53,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const dailyForecastContainer = document.querySelector('.daily-forecast');
         dailyForecastContainer.innerHTML = ''; // Clear any previous data
 
-        // Group forecasts by day and find the max temperature for each day
-        const dailyForecasts = {};
-
+        // Display the daily forecasts
         data.list.forEach(forecast => {
             const date = new Date(forecast.dt * 1000);
             const day = date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
-
-            if (!dailyForecasts[day]) {
-                dailyForecasts[day] = {
-                    maxTemp: Math.round(forecast.main.temp),
-                    icon: forecast.weather[0].icon
-                };
-            } else {
-                if (forecast.main.temp > dailyForecasts[day].maxTemp) {
-                    dailyForecasts[day].maxTemp = Math.round(forecast.main.temp);
-                    dailyForecasts[day].icon = forecast.weather[0].icon;
-                }
-            }
-        });
-
-        // Display the daily forecasts
-        Object.keys(dailyForecasts).forEach(day => {
-            const forecast = dailyForecasts[day];
 
             const dayElement = document.createElement('div');
             dayElement.classList.add('day');
 
             dayElement.innerHTML = `
                 <div class="day-name">${day}</div>
-                <img src="http://openweathermap.org/img/wn/${forecast.icon}.png" alt="Weather icon">
-                <div class="temp">${forecast.maxTemp}℉</div>
+                <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
+                <div class="temp">${Math.round(forecast.temp.day)}℉</div>
             `;
 
             dailyForecastContainer.appendChild(dayElement);
@@ -99,7 +79,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const lon = position.coords.longitude;
                 fetchWeatherData(lat, lon);
                 fetchHourlyForecast(lat, lon);
-                fiveDayweatherForecast(lat, lon);
+                sevenDayWeatherForecast(lat, lon);
                 fetchAdditionalData(lat,lon);
 
             }, (error) => {
@@ -183,7 +163,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
     }
-    
+
     function renderHourlyForecast() {
         const hourlyForecastList = document.querySelector('.hourly-forecast-list');
     
@@ -243,7 +223,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const city = document.getElementById('city').value;
         fetchCityCoordinates(city);
     });
-    
+
     // Fetches the coordinates of the city
     function fetchCityCoordinates(city) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
@@ -270,6 +250,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize city name autocomplete
     autocompleteCityName();
 
+
     // Function to fetch additional weather data
     function fetchAdditionalData(lat, lon) {
         const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
@@ -290,6 +271,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
+    
     function renderAdditionalData(data) {
         const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
         additionalDataContainer.className = 'additional-data';
@@ -350,8 +332,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const city = document.getElementById('city').value;
         const apiKey = '8b1f87258c77029f37948a5789d9f82a'; 
         const apiUrl =  `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
-        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl2 = `https://api.openweathermap.org/data/2.5/forecast/daily?q=${city}&appid=${apiKey}&units=imperial`;
         const apiUrl3 = `https://pro.openweathermap.org/data/2.5/forecast/hourly?q=${city}&appid=${apiKey}&units=imperial`;
+        const apiUrl4 = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`;
 
         //fetches current temp based on city input 
         fetch(apiUrl)
@@ -408,7 +391,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
 
         
-        fetch(apiUrl2)
+        fetch(apiUrl4)
             .then(response => response.json())
             .then(data => {
                 if (data.cod === "200") {
