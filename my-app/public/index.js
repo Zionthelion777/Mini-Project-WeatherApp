@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     currentWeatherData = data; // Store the data for later use
                     const weatherDescription = data.weather[0].description;
                     const temperature = Math.round(data.main.temp);
-                    const temperature = Math.round(data.main.temp);
                     const location = data.name;
                     const maxTemp = Math.round(data.main.temp_max);
                     const minTemp = Math.round(data.main.temp_min);
@@ -508,3 +507,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 console.error('Error fetching the hourly forecast data:', error);
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
+            */
