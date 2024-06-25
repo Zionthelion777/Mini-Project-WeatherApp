@@ -72,10 +72,6 @@ Developed by: Jenny Lin, Zion Bishop, Lahcen Aqdim, Annika Cruz
 
 This project was developed with the help of generative AI.
 
-## Contact 📧
-
-For any questions or support, please contact us at [support@example.com].
-
 ---
 
 Thank you for using WeatherWise! Stay informed and stay safe. 🌈
