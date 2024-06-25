@@ -29,47 +29,51 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
-    //Fetches daily forecast 
-    function sevenDayWeatherForecast(lat, lon) {
-        const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial&cnt=7`;
+// Fetches daily forecast 
+function sevenDayWeatherForecast(lat, lon) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial&cnt=7`;
 
-        fetch(apiUrl)
-            .then(resp => resp.json())
-            .then(data => {
-                if (data.cod === "200") {
-                    drawWeather(data);
-                } else {
-                    alert('Error fetching 7-day forecast data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the 7-day forecast data:', error);
-                alert('Error fetching the 7-day forecast data. Please try again later.');
-            });
-    }
-
-    // Draws the weather forecast
-    function drawWeather(data) {
-        const dailyForecastContainer = document.querySelector('.daily-forecast');
-        dailyForecastContainer.innerHTML = ''; // Clear any previous data
-
-        // Display the daily forecasts
-        data.list.forEach(forecast => {
-            const date = new Date(forecast.dt * 1000);
-            const day = date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
-
-            const dayElement = document.createElement('div');
-            dayElement.classList.add('day');
-
-            dayElement.innerHTML = `
-                <div class="day-name">${day}</div>
-                <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
-                <div class="temp">${Math.round(forecast.temp.day)}℉</div>
-            `;
-
-            dailyForecastContainer.appendChild(dayElement);
+    fetch(apiUrl)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.cod === "200") {
+                drawWeather(data);
+            } else {
+                alert('Error fetching 7-day forecast data. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching the 7-day forecast data:', error);
+            alert('Error fetching the 7-day forecast data. Please try again later.');
         });
-    }
+}
+
+// Draws the weather forecast
+function drawWeather(data) {
+    const dailyForecastContainer = document.querySelector('.daily-forecast');
+    dailyForecastContainer.innerHTML = ''; // Clear any previous data
+
+    // Display the daily forecasts
+    data.list.forEach(forecast => {
+        const date = new Date(forecast.dt * 1000);
+        const day = date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
+
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+
+        dayElement.innerHTML = `
+            <div class="day-name">${day}</div>
+            <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
+            <div class="temp">${Math.round(forecast.temp.day)}℉</div>
+            <div class="high-low">
+                <div class="high">${Math.round(forecast.temp.max)}℉</div>
+                <div class="low">${Math.round(forecast.temp.min)}℉</div>
+            </div>
+        `;
+
+        dailyForecastContainer.appendChild(dayElement);
+    });
+}
 
     // Function to get current location
     function getCurrentLocation() {
@@ -91,55 +95,59 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    // Autocomplete function for city names
-    function autocompleteCityName() {
-        const input = document.getElementById('city');
-        const suggestionsContainer = document.getElementById('suggestions');
+// Autocomplete function for city names
+function autocompleteCityName() {
+    const input = document.getElementById('city');
+    const suggestionsContainer = document.getElementById('suggestions');
 
-        input.addEventListener('input', function () {
-            const query = input.value.trim();
+    input.addEventListener('input', function () {
+        const query = input.value.trim();
 
-            if (query.length > 0) {
-                const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=imperial`;
+        if (query.length >= 2) { // Start suggesting after 2 characters
+            const apiUrl = `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&sort=population&cnt=5&appid=${apiKey}&units=imperial`;
 
-                fetch(apiUrl)
-                    .then(resp => resp.json())
-                    .then(data => {
-                        if (data.cod === "200") {
-                            suggestionsContainer.innerHTML = ''; // Clear previous suggestions
-                            suggestionsContainer.style.display = 'block'; // Show suggestions container
+            fetch(apiUrl)
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.cod === "200" && data.count > 0) {
+                        suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                        suggestionsContainer.style.display = 'block'; // Show suggestions container
 
-                            data.list.forEach(city => {
-                                const suggestion = document.createElement('div');
-                                suggestion.textContent = `${city.name}, ${city.sys.country}`;
-                                suggestion.addEventListener('click', function () {
-                                    input.value = city.name;
-                                    suggestionsContainer.innerHTML = '';
-                                    suggestionsContainer.style.display = 'none';
-                                });
-                                suggestionsContainer.appendChild(suggestion);
+                        data.list.forEach(city => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'suggestion';
+                            suggestion.textContent = `${city.name}, ${city.sys.country}`;
+                            suggestion.addEventListener('click', function () {
+                                input.value = `${city.name}, ${city.sys.country}`;
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none';
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching city suggestions:', error);
-                    });
-            } else {
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-            }
-        });
+                            suggestionsContainer.appendChild(suggestion);
+                        });
+                    } else {
+                        suggestionsContainer.innerHTML = '<div class="no-suggestions">No suggestions found</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching city suggestions:', error);
+                });
+        } else {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+        }
+    });
 
-        document.addEventListener('click', function (e) {
-            if (!suggestionsContainer.contains(e.target) && e.target !== input) {
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-            }
-        });
-    }
+    document.addEventListener('click', function (e) {
+        if (!suggestionsContainer.contains(e.target) && e.target !== input) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+}
+
 
     let currentHourlyPage = 0;
-    const hoursPerPage = 5;
+    const hoursPerPage = 7;
     let hourlyDataCache = [];
     
     // Fetches hourly forecast
@@ -326,37 +334,48 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
         });
     }
+// Fetches news
+fetchNewsData();
 
-    //fetches news
-    fetchNewsData();
+// Function to fetch news data
+function fetchNewsData() {
+    const newsApiKey = '4a6195c720414a1ab7f0068f947f8853';
+    const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
 
-    // Function to fetch news data
-    function fetchNewsData() {
-        const newsApiKey = '4a6195c720414a1ab7f0068f947f8853';
-        const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                renderNewsData(data.articles);
+            } else {
+                alert('Error fetching news data. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching the news data:', error);
+            alert('Error fetching the news data. Please try again later.');
+        });
+}
 
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "ok") {
-                    renderNewsData(data.articles);
-                } else {
-                    alert('Error fetching news data. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching the news data:', error);
-                alert('Error fetching the news data. Please try again later.');
-            });
-    }
+// Function to render news data
+function renderNewsData(articles) {
+    const newsContainer = document.querySelector('.news-container') || document.createElement('div');
+    newsContainer.className = 'news-container';
 
-    // Function to render news data
-    function renderNewsData(articles) {
-        const newsContainer = document.querySelector('.news-container') || document.createElement('div');
-        newsContainer.className = 'news-container';
-        newsContainer.innerHTML = ''; // Clear any previous data
+    const newsContent = document.createElement('div');
+    newsContent.className = 'news-content';
 
-        articles.forEach(article => {
+    // Pagination
+    let currentPage = 0;
+    const articlesPerPage = 3;
+
+    function showPage(page) {
+        newsContent.innerHTML = '';
+        const start = page * articlesPerPage;
+        const end = start + articlesPerPage;
+        const paginatedArticles = articles.slice(start, end);
+
+        paginatedArticles.forEach(article => {
             const articleElement = document.createElement('div');
             articleElement.className = 'article';
 
@@ -368,15 +387,48 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 <a href="${article.url}" target="_blank" class="news-link">Read more</a>
             `;
 
-            newsContainer.appendChild(articleElement);
+            newsContent.appendChild(articleElement);
         });
 
-        // Append the news container to the body if it's not already there
-        if (!document.querySelector('.news-container')) {
-            document.body.appendChild(newsContainer);
-        }
+        newsContainer.appendChild(newsContent);
     }
 
+    // Navigation buttons
+    const navButtons = document.createElement('div');
+    navButtons.className = 'news-navigation';
+
+    const prevButton = document.createElement('button');
+    prevButton.textContent = 'Previous';
+    prevButton.disabled = true;
+    prevButton.addEventListener('click', () => {
+        currentPage--;
+        showPage(currentPage);
+        nextButton.disabled = currentPage >= Math.ceil(articles.length / articlesPerPage) - 1;
+        prevButton.disabled = currentPage <= 0;
+    });
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next';
+    nextButton.disabled = articles.length <= articlesPerPage;
+    nextButton.addEventListener('click', () => {
+        currentPage++;
+        showPage(currentPage);
+        prevButton.disabled = currentPage <= 0;
+        nextButton.disabled = currentPage >= Math.ceil(articles.length / articlesPerPage) - 1;
+    });
+
+    navButtons.appendChild(prevButton);
+    navButtons.appendChild(nextButton);
+    newsContainer.appendChild(navButtons);
+
+    // Initial render
+    showPage(currentPage);
+
+    // Append the news container to the body if it's not already there
+    if (!document.querySelector('.news-container')) {
+        document.body.appendChild(newsContainer);
+    }
+}
     // Fetch weather data based on city input
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
