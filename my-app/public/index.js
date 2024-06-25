@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(data => {
                 if (data.cod === "200") {
                     currentHourlyData = data.list.slice(0, 24);
+                    currentHourlyPage = 0; 
                     renderHourlyForecast();
                 } else {
                     alert('Error fetching hourly forecast data. Please try again.');
@@ -73,6 +74,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 alert('Error fetching the hourly forecast data. Please try again later.');
             });
     }
+
+
 
     // Render hourly forecast data
     function renderHourlyForecast() {
@@ -264,6 +267,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize city name autocomplete
     autocompleteCityName();
 
+     // Event listeners for navigation buttons
+     document.getElementById('prevHours').addEventListener('click', () => {
+        if (currentHourlyPage > 0) {
+            currentHourlyPage--;
+            renderHourlyForecast();
+        }
+    });
+    
+    document.getElementById('nextHours').addEventListener('click', () => {
+        if (currentHourlyPage < Math.floor(hourlyDataCache.length / hoursPerPage)) {
+            currentHourlyPage++;
+            renderHourlyForecast();
+        }
+    });
     // Function to get current location
     function getCurrentLocation() {
         if (navigator.geolocation) {
@@ -327,3 +344,53 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 });
+
+ //fetches news
+ fetchNewsData();
+
+ // Function to fetch news data
+ function fetchNewsData() {
+     const newsApiKey = '4a6195c720414a1ab7f0068f947f8853';
+     const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
+
+     fetch(apiUrl)
+         .then(response => response.json())
+         .then(data => {
+             if (data.status === "ok") {
+                 renderNewsData(data.articles);
+             } else {
+                 alert('Error fetching news data. Please try again.');
+             }
+         })
+         .catch(error => {
+             console.error('Error fetching the news data:', error);
+             alert('Error fetching the news data. Please try again later.');
+         });
+ }
+
+ // Function to render news data
+ function renderNewsData(articles) {
+     const newsContainer = document.querySelector('.news-container') || document.createElement('div');
+     newsContainer.className = 'news-container';
+     newsContainer.innerHTML = ''; // Clear any previous data
+
+     articles.forEach(article => {
+         const articleElement = document.createElement('div');
+         articleElement.className = 'article';
+
+         articleElement.innerHTML = `
+             <img src="${article.urlToImage}" alt="News Image" class="news-image">
+             <div class="news-title">${article.title}</div>
+             <div class="news-author">${article.author ? 'By ' + article.author : ''}</div>
+             <div class="news-description">${article.description}</div>
+             <a href="${article.url}" target="_blank" class="news-link">Read more</a>
+         `;
+
+         newsContainer.appendChild(articleElement);
+     });
+
+     // Append the news container to the body if it's not already there
+     if (!document.querySelector('.news-container')) {
+         document.body.appendChild(newsContainer);
+     }
+ }
