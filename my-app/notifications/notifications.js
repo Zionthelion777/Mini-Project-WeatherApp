@@ -1,25 +1,53 @@
 const severeWeatherAlertsAPIKey = "22KrLqgipPzjZyD6YRSg0S22mAmXsXUPxJtnFkleQBtYPwnppphXJQQJ99AFACYeBjFqD6kjAAAgAZMPlcTp";
-var notifsInterval;
+const openWeatherApiKey = "8b1f87258c77029f37948a5789d9f82a";
+let hourTimer;
 
-// Check toggle switch
-$(document).ready(function(){
-    $("#enable-notifs").click(function() {
-        if ($("#enable-notifs").prop('checked') == true) {
-            enableNotifs().then((areNotifsEnabled) => {
-                if (areNotifsEnabled) {
-                    console.log('Notifications are enabled:', areNotifsEnabled);
-                } else {
-                    $("#enable-notifs").prop('checked', false);
-                }
-            }).catch((error) => {
-                console.log('An error occurred:', error);
-            });
-        } else {
-            clearInterval(notifsInterval);
-            console.log("Notifications are disabled.");
-        }
-    });
+// Ensure toggles are active while on other pages / upon reload
+const enableNotifsToggle = document.getElementById('enable-notifs');
+const enableSearchNotifsToggle = document.getElementById('enable-search-notifs');
+
+enableNotifsToggle.addEventListener('change', (e) => {
+    // Turn on/off notifs
+    if ( e.target.checked ) {
+        enableNotifs().then((areNotifsEnabled) => {
+            if (areNotifsEnabled) {
+                console.log('Notifications are enabled:', areNotifsEnabled);
+                localStorage.setItem('areNotifsEnabled', 'true');
+            } else {
+                e.target.checked = false;
+                localStorage.setItem('areNotifsEnabled', 'false');
+            }
+        }).catch((error) => { // Can't turn off notifs
+            console.log('Unable to enable notifications:', error);
+        });
+    }
+    // Turn off notifs
+    else {
+        clearTimeout(hourTimer);
+        localStorage.setItem('areNotifsEnabled', 'false');
+    }
 });
+
+enableSearchNotifsToggle.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        localStorage.setItem('areSearchNotifsEnabled', 'true');
+    } else {
+        localStorage.setItem('areSearchNotifsEnabled', 'false');
+    }
+});
+
+window.addEventListener('load', () => {
+    let notifStatus = localStorage.getItem('areNotifsEnabled');
+    document.getElementById('enable-notifs').checked = notifStatus === 'true' ? true : false;
+    if ( notifStatus === 'true' )
+        callRegularNotifs();
+    else {
+        clearTimeout(hourTimer);
+    }
+
+    let searchNotifStatus = localStorage.getItem('areSearchNotifsEnabled');
+    document.getElementById('enable-search-notifs').checked = searchNotifStatus === 'true' ? true : false;
+})
 
 // Handle toggle on
 function enableNotifs() {
@@ -36,7 +64,17 @@ function enableNotifs() {
                 Notification.requestPermission().then((permission) => {
                     if (permission === 'granted') {
                         console.log("Permission granted");
-                        callNotifs();
+
+                        // Set start time
+                        let notifTime = new Date();
+                        localStorage.setItem('lastNotifTime', notifTime);
+
+                        getLocation().then(currentCoords => {
+                            sendNotifs(getSevereAlerts, currentCoords);
+                        }).catch(error => {
+                            console.log('Error getting local notif: ', error);
+                        });
+
                         resolve(true);
                     } else {
                         console.log('Permission not granted.');
@@ -49,7 +87,7 @@ function enableNotifs() {
                     reject(err);
                 })
             } else {
-                callNotifs();
+                callRegularNotifs();
                 resolve(true);
             }
         }
@@ -57,14 +95,37 @@ function enableNotifs() {
 }
 
 // Call notifications every hour (and when notifs are first turned on)
-function callNotifs() {
-    sendNotifs();
-    notifsInterval = setInterval(sendNotifs, 3600000);
+function callRegularNotifs() {
+    let timeSinceLastNotif = Date.now() - localStorage.getItem('lastNotifTime');
+
+    if (timeSinceLastNotif >= 3600000 || !timeSinceLastNotif) {
+        getLocation().then(currentCoords => {
+            sendNotifs(getSevereAlerts, currentCoords);
+            localStorage.setItem('lastNotifTime', Date.now());
+            hourTimer = setTimeout(callRegularNotifs, 3600000);
+        }).catch(error => {
+            console.log('Error getting local notifs: ', error);
+        });
+    }
+}
+
+// Bring up severe weather notifications for cities that are searched up, if setting is on
+function callSearchNotifs(city) {
+    let areSearchNotifsEnabled = localStorage.getItem('areSearchNotifsEnabled');
+    if (areSearchNotifsEnabled === 'false') {
+        return;
+    }
+    
+    getCityCoords(city).then(cityCoords => {
+        sendNotifs(getSevereAlerts, cityCoords);
+    }).catch(error => {
+        console.log('Error getting city notifs: ', error);
+    });
 }
 
 // Create & send out notifs
-function sendNotifs() {
-    getAlerts().then(alertData => {
+function sendNotifs(alertType, coords) {
+    alertType(coords).then(alertData => {
         for (const alert of alertData) {
             let title = alert.title;
             let body = alert.body;
@@ -76,14 +137,14 @@ function sendNotifs() {
     });
 }
 
-// Receive alerts in proper format
-function getAlerts() {
+// Receive regular alerts
+function getRegularAlerts() {
     return new Promise((resolve, reject) => {
         let alerts = [];
         getLocation()
             .then(currentCoords => getSevereAlerts(currentCoords.lat, currentCoords.lon))
-            .then(severeAlerts => {
-                alerts.push(...severeAlerts);
+            .then(fetchedAlerts => {
+                alerts.push(...fetchedAlerts);
                 console.log(alerts.length);
                 resolve(alerts);
             })
@@ -114,9 +175,10 @@ function getLocation() {
 }
 
 // Get severe weather alerts
-function getSevereAlerts(lat, lon) {
+function getSevereAlerts(coords) {
+    let lat = coords.lat;
+    let lon = coords.lon;
     const severeApiUrl = `https://atlas.microsoft.com/weather/severe/alerts/json?api-version=1.1&query=${lat},${lon}&subscription-key=${severeWeatherAlertsAPIKey}`;
-    console.log("Getting severe alerts");
     return new Promise((resolve, reject) => {
         let alerts = [];
         fetch(severeApiUrl)
@@ -128,7 +190,6 @@ function getSevereAlerts(lat, lon) {
                 }
             })
             .then(data => {
-                console.log(data);
                 let topic = "severe-weather-alert";
                 for (let i = 0; i < data.results.length; i++) {
                     let severeAlert = data.results[i];
@@ -150,3 +211,45 @@ function getSevereAlerts(lat, lon) {
             });
     });
 }
+
+// Get coordinates from city name
+function getCityCoords(city) {
+    geocodingApiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${openWeatherApiKey}`;
+    return new Promise((resolve, reject) => {
+        fetch(geocodingApiUrl)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                console.error("HTTP Error " + response.status);
+            }
+        })
+        .then(data => {
+            resolve({ lat: data[0].lat, lon: data[0].lon });
+        })
+        .catch(error => {
+            console.error('Error finding city coordinates: ', error);
+            reject(error);
+        });
+    });
+}
+
+// // DAILY WEATHER ALERTS
+
+// // Set weather alerts for same time every day
+// function runAtSpecificTimeOfDay(hour, minutes, func)
+// {
+//   const twentyFourHours = 86400000;
+//   const now = new Date();
+//   let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
+//   if (eta_ms < 0)
+//   {
+//     eta_ms += twentyFourHours;
+//   }
+//   setTimeout(function() {
+//     //run once
+//     func();
+//     // run every 24 hours from now on
+//     setInterval(func, twentyFourHours);
+//   }, eta_ms);
+// }
