@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', (event) => {
+    const toggleButton = document.getElementById('toggleAdditionalData');
+    const additionalDataContainer = document.querySelector('.additional-data');
     const apiKey = '8b1f87258c77029f37948a5789d9f82a';
     let currentUnits = 'imperial'; // Default units
     let currentCoords = null; // Store current coordinates
@@ -6,16 +8,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let currentWeatherData = null; // Store current weather data
     let currentHourlyData = []; // Store current hourly data
     let currentSevenDayData = []; // Store current 7-day forecast data
+    let currentHourlyPage = 0; // Track the current page for hourly data
+    const hoursPerPage = 5; // Number of hours to display per page
+
+    toggleButton.addEventListener('click', () => {
+        if (additionalDataContainer.style.display === 'none' || additionalDataContainer.style.display === '') {
+            additionalDataContainer.style.display = 'flex';
+            toggleButton.innerHTML = 'Hide Additional Data';
+        } else {
+            additionalDataContainer.style.display = 'none';
+            toggleButton.innerHTML = 'Show Additional Data';
+        }
+    });
+
+    // Function to render additional weather data
+    function renderAdditionalData(data) {
+        additionalDataContainer.querySelector('.data-item[data-info="Cloudiness"] .data-value').innerText = `${data.clouds?.all ?? 'N/A'}%`;
+        additionalDataContainer.querySelector('.data-item[data-info="Wind Speed"] .data-value').innerText = `${data.wind?.speed ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}`;
+        additionalDataContainer.querySelector('.data-item[data-info="Wind Direction"] .data-value').innerText = `${data.wind?.deg ?? 'N/A'}°`;
+        additionalDataContainer.querySelector('.data-item[data-info="Wind Gust"] .data-value').innerText = `${data.wind?.gust ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}`;
+        additionalDataContainer.querySelector('.data-item[data-info="Rain Volume"] .data-value').innerText = `${data.rain?.['1h'] ?? 0} mm`;
+        additionalDataContainer.querySelector('.data-item[data-info="Snow Volume"] .data-value').innerText = `${data.snow?.['1h'] ?? 0} mm`;
+        additionalDataContainer.querySelector('.data-item[data-info="Visibility"] .data-value').innerText = `${data.visibility ?? 'N/A'} meters`;
+        additionalDataContainer.querySelector('.data-item[data-info="Precipitation Probability"] .data-value').innerText = `${data.pop ? data.pop * 100 : 'N/A'}%`;
+    }
+
 
     // Function to fetch weather data based on coordinates
     function fetchWeatherData(lat, lon) {
         currentCoords = { lat, lon };
+        currentCity = null; // Clear city name when coordinates are used
         fetchWeatherDataCommon(`lat=${lat}&lon=${lon}`);
     }
 
     // Function to fetch weather data based on city name
     function fetchWeatherDataByCity(city) {
         currentCity = city;
+        currentCoords = null; // Clear coordinates when city name is used
         fetchWeatherDataCommon(`q=${city}`);
     }
 
@@ -63,8 +92,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(data => {
                 if (data.cod === "200") {
                     currentHourlyData = data.list.slice(0, 24);
-                    currentHourlyPage = 0; 
-                    renderHourlyForecast();
+                    currentHourlyPage = 0; // Reset to the first page
+                    renderHourlyForecast(); // Render the first 5 hours
                 } else {
                     alert('Error fetching hourly forecast data. Please try again.');
                 }
@@ -75,14 +104,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
             });
     }
 
-
-
     // Render hourly forecast data
     function renderHourlyForecast() {
         const hourlyForecastList = document.querySelector('.hourly-forecast-list');
         hourlyForecastList.innerHTML = ''; // Clear previous data
 
-        currentHourlyData.forEach(hour => {
+        // Calculate start and end indices for the current page
+        const start = currentHourlyPage * hoursPerPage;
+        const end = Math.min(start + hoursPerPage, currentHourlyData.length);
+        const paginatedData = currentHourlyData.slice(start, end);
+
+        paginatedData.forEach(hour => {
             const hourlyElement = document.createElement('div');
             hourlyElement.className = 'hourly';
 
@@ -104,6 +136,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             hourlyForecastList.appendChild(hourlyElement);
         });
+
+        // Update button states
+        document.getElementById('prevHours').disabled = currentHourlyPage === 0;
+        document.getElementById('nextHours').disabled = end >= currentHourlyData.length;
     }
 
     // Fetch 7-day forecast data
@@ -168,60 +204,41 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     // Render additional weather data
-    function renderAdditionalData(data) {
-        const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
-        additionalDataContainer.className = 'additional-data';
+function renderAdditionalData(data) {
+    const additionalDataContainer = document.querySelector('.additional-data') || document.createElement('div');
+    additionalDataContainer.className = 'additional-data';
 
-        additionalDataContainer.innerHTML = `
-            <div class="data-item" data-info="Cloudiness: ${data.clouds?.all ?? 'N/A'}%">
-                <i class="fas fa-cloud"></i>
-            </div>
-            <div class="data-item" data-info="Wind Speed: ${data.wind?.speed ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}">
-                <i class="fas fa-wind"></i>
-            </div>
-            <div class="data-item" data-info="Wind Direction: ${data.wind?.deg ?? 'N/A'}°">
-                <i class="fas fa-compass"></i>
-            </div>
-            <div class="data-item" data-info="Wind Gust: ${data.wind?.gust ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}">
-                <i class="fas fa-wind"></i>
-            </div>
-            <div class="data-item" data-info="Rain Volume: ${data.rain?.['1h'] ?? 0} mm">
-                <i class="fas fa-cloud-showers-heavy"></i>
-            </div>
-            <div class="data-item" data-info="Snow Volume: ${data.snow?.['1h'] ?? 0} mm">
-                <i class="fas fa-snowflake"></i>
-            </div>
-            <div class="data-item" data-info="Visibility: ${data.visibility ?? 'N/A'} meters">
-                <i class="fas fa-eye"></i>
-            </div>
-            <div class="data-item" data-info="Precipitation Probability: ${data.pop ? data.pop * 100 : 'N/A'}%">
-                <i class="fas fa-tint"></i>
-            </div>
-        `;
+    additionalDataContainer.innerHTML = `
+        <div class="data-item">
+            <i class="fas fa-cloud"></i> Cloudiness: ${data.clouds?.all ?? 'N/A'}%
+        </div>
+        <div class="data-item">
+            <i class="fas fa-wind"></i> Wind Speed: ${data.wind?.speed ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}
+        </div>
+        <div class="data-item">
+            <i class="fas fa-compass"></i> Wind Direction: ${data.wind?.deg ?? 'N/A'}°
+        </div>
+        <div class="data-item">
+            <i class="fas fa-wind"></i> Wind Gust: ${data.wind?.gust ?? 'N/A'} ${currentUnits === 'imperial' ? 'mph' : 'm/s'}
+        </div>
+        <div class="data-item">
+            <i class="fas fa-cloud-showers-heavy"></i> Rain Volume: ${data.rain?.['1h'] ?? 0} mm
+        </div>
+        <div class="data-item">
+            <i class="fas fa-snowflake"></i> Snow Volume: ${data.snow?.['1h'] ?? 0} mm
+        </div>
+        <div class="data-item">
+            <i class="fas fa-eye"></i> Visibility: ${data.visibility ?? 'N/A'} meters
+        </div>
+        <div class="data-item">
+            <i class="fas fa-tint"></i> Precipitation Probability: ${data.pop ? data.pop * 100 : 'N/A'}%
+        </div>
+    `;
 
-        if (!document.querySelector('.additional-data')) {
-            document.body.appendChild(additionalDataContainer);
-        }
-
-        // Add event listeners for hover effect
-        document.querySelectorAll('.data-item').forEach(item => {
-            item.addEventListener('mouseenter', (event) => {
-                const infoBox = document.createElement('div');
-                infoBox.className = 'info-box';
-                infoBox.innerText = event.currentTarget.getAttribute('data-info');
-                document.body.appendChild(infoBox);
-
-                const rect = event.currentTarget.getBoundingClientRect();
-                infoBox.style.left = `${rect.left + window.scrollX}px`;
-                infoBox.style.top = `${rect.bottom + window.scrollY + 5}px`;
-            });
-
-            item.addEventListener('mouseleave', () => {
-                document.querySelector('.info-box').remove();
-            });
-        });
+    if (!document.querySelector('.additional-data')) {
+        document.body.appendChild(additionalDataContainer);
     }
-
+}
     // Toggle units between Celsius and Fahrenheit
     document.getElementById('toggleUnits').addEventListener('click', function() {
         currentUnits = currentUnits === 'imperial' ? 'metric' : 'imperial';
@@ -267,20 +284,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize city name autocomplete
     autocompleteCityName();
 
-     // Event listeners for navigation buttons
-     document.getElementById('prevHours').addEventListener('click', () => {
-        if (currentHourlyPage > 0) {
-            currentHourlyPage--;
-            renderHourlyForecast();
-        }
-    });
-    
-    document.getElementById('nextHours').addEventListener('click', () => {
-        if (currentHourlyPage < Math.floor(hourlyDataCache.length / hoursPerPage)) {
-            currentHourlyPage++;
-            renderHourlyForecast();
-        }
-    });
     // Function to get current location
     function getCurrentLocation() {
         if (navigator.geolocation) {
@@ -343,8 +346,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
         });
     }
-});
 
+    // Event listeners for hourly forecast navigation buttons
+    document.getElementById('prevHours').addEventListener('click', () => {
+        if (currentHourlyPage > 0) {
+            currentHourlyPage--;
+            renderHourlyForecast();
+        }
+    });
+
+    document.getElementById('nextHours').addEventListener('click', () => {
+        if (currentHourlyPage < Math.floor(currentHourlyData.length / hoursPerPage)) {
+            currentHourlyPage++;
+            renderHourlyForecast();
+        }
+    });
+});
  //fetches news
  fetchNewsData();
 
@@ -374,6 +391,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
      newsContainer.className = 'news-container';
      newsContainer.innerHTML = ''; // Clear any previous data
 
+     const newsContent = document.createElement('div');
+     newsContent.className = 'news-content';
+     
      articles.forEach(article => {
          const articleElement = document.createElement('div');
          articleElement.className = 'article';
@@ -394,3 +414,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
          document.body.appendChild(newsContainer);
      }
  }
+
+  // Show/Hide News functionality
+  document.getElementById('showNewsButton').addEventListener('click', function() {
+    const newsContainer = document.querySelector('.news-container');
+    if (newsContainer.style.display === 'none' || newsContainer.style.display === '') {
+        newsContainer.style.display = 'block';
+        this.innerHTML = 'Hide News';
+    } else {
+        newsContainer.style.display = 'none';
+        this.innerHTML = 'Show News';
+    }
+});
