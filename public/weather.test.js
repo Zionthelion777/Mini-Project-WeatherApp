@@ -1,6 +1,9 @@
+// __tests__/weather.test.js
 const { JSDOM } = require('jsdom');
-const fetch = require('node-fetch');
-global.fetch = fetch;
+const fetchMock = require('jest-fetch-mock');
+fetchMock.enableMocks();
+
+// Mocking the DOM
 const { window } = new JSDOM(`<!DOCTYPE html><body>
     <div class="temperature"></div>
     <div class="location"></div>
@@ -8,8 +11,10 @@ const { window } = new JSDOM(`<!DOCTYPE html><body>
 </body>`);
 global.document = window.document;
 
+// The function to be tested
 const apiKey = '8b1f87258c77029f37948a5789d9f82a';
-const fetchWeatherData = (lat, lon) => {
+
+function fetchWeatherData(lat, lon) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
 
     return fetch(apiUrl)
@@ -35,7 +40,7 @@ const fetchWeatherData = (lat, lon) => {
             console.error('Error fetching the weather data:', error);
             throw error;
         });
-};
+}
 
 describe('fetchWeatherData', () => {
     beforeEach(() => {
