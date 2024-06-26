@@ -431,7 +431,16 @@ function renderAdditionalData(data) {
      if (!document.querySelector('.news-container')) {
          document.body.appendChild(newsContainer);
      }
-     
  }
 
-  
+  // Show/Hide News functionality
+  document.getElementById('showNewsButton').addEventListener('click', function() {
+    const newsContainer = document.querySelector('.news-container');
+    if (newsContainer.style.display === 'none' || newsContainer.style.display === '') {
+        newsContainer.style.display = 'block';
+        this.innerHTML = 'Hide News';
+    } else {
+        newsContainer.style.display = 'none';
+        this.innerHTML = 'Show News';
+    }
+});
