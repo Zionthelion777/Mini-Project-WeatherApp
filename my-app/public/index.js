@@ -275,7 +275,7 @@ function renderAdditionalData(data) {
 
     // Handle click event for the Temperature Map button
     document.getElementById('tempMapButton').addEventListener('click', function() {
-        window.location.href = 'temperature.html';
+        window.location.href = 'weathermap/temperature.html';
     });
      
 
