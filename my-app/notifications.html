@@ -13,21 +13,19 @@
         <h1>Notifications</h1>
         <div class="wrapper">
             <label class="switch">
-                <input type="checkbox" id="enable-notifs" name="enable-notifs">
+                <input type="checkbox" id="enable-local-notifs" name="enable-local-notifs">
                 <span class="slider"></span>
             </label>
-            <label for="enable-notifs">Enable notifications</label>
+            <label for="enable-local-notifs">Enable notifications based on your current location</label>
         </div>
         <div class="wrapper">
             <label class="switch">
                 <input type="checkbox" id="enable-search-notifs" name="enable-search-notifs">
                 <span class="slider"></span>
             </label>
-            <label for="enable-search-notifs">Enable severe weather notifications for locations you search</label>
+            <label for="enable-search-notifs">Enable notifications for locations searched</label>
         </div>
     </div>
-
-    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
     <script src="notifications/notifications.js"></script>
 </body>
 </html>

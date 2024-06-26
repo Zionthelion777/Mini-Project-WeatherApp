@@ -1,93 +1,129 @@
 const severeWeatherAlertsAPIKey = "22KrLqgipPzjZyD6YRSg0S22mAmXsXUPxJtnFkleQBtYPwnppphXJQQJ99AFACYeBjFqD6kjAAAgAZMPlcTp";
 const openWeatherApiKey = "8b1f87258c77029f37948a5789d9f82a";
 let hourTimer;
+const HOUR_LENGTH = 3600000;
 
 // Ensure toggles are active while on other pages / upon reload
-const enableNotifsToggle = document.getElementById('enable-notifs');
-const enableSearchNotifsToggle = document.getElementById('enable-search-notifs');
-
-enableNotifsToggle.addEventListener('change', (e) => {
-    // Turn on/off notifs
-    if ( e.target.checked ) {
-        enableNotifs().then((areNotifsEnabled) => {
-            if (areNotifsEnabled) {
-                console.log('Notifications are enabled:', areNotifsEnabled);
-                localStorage.setItem('areNotifsEnabled', 'true');
-            } else {
-                e.target.checked = false;
-                localStorage.setItem('areNotifsEnabled', 'false');
+let enableLocalNotifsToggle = document.getElementById('enable-local-notifs');
+// Turn on/off notifs
+if (enableLocalNotifsToggle) {
+        enableLocalNotifsToggle.addEventListener('change', (e) => {
+            if ( e.target.checked ) {
+                enableNotifs().then((areNotifsEnabled) => {
+                    if (areNotifsEnabled) { // able to enable notifs
+                        
+                        localStorage.setItem('areLocalNotifsEnabled', 'true');
+                        console.log(localStorage.getItem('areLocalNotifsEnabled', 'true'));
+                        localStorage.setItem('isLocalJustEnabled', 'true');
+                        console.log(localStorage.getItem('isLocalJustEnabled'));
+                        callLocalNotifs().then(success => {
+                            console.log("are local notifs enabled: ", success);
+                            if (success) {
+                                e.target.checked = true;
+                            } else {
+                                e.target.checked = false;
+                                localStorage.setItem('areLocalNotifsEnabled', 'false');
+                            }
+                        });
+                    } else { // Unable to enable notifs
+                        e.target.checked = false;
+                        localStorage.setItem('areLocalNotifsEnabled', 'false');
+                    }
+                }).catch((error) => { // Unable to enable notifs
+                    localStorage.setItem('areLocalNotifsEnabled', 'false');
+                });
             }
-        }).catch((error) => { // Can't turn off notifs
-            console.log('Unable to enable notifications:', error);
+            // Turn off local notifs
+            else {
+                clearTimeout(hourTimer);
+                localStorage.setItem('areLocalNotifsEnabled', 'false');
+                localStorage.setItem('isLocalJustEnabled', 'false');
+            }
         });
-    }
-    // Turn off notifs
-    else {
-        clearTimeout(hourTimer);
-        localStorage.setItem('areNotifsEnabled', 'false');
-    }
-});
+}
 
-enableSearchNotifsToggle.addEventListener('change', (e) => {
-    if (e.target.checked) {
-        localStorage.setItem('areSearchNotifsEnabled', 'true');
-    } else {
+// Allow for search notifs on main page
+let enableSearchNotifsToggle = document.getElementById('enable-search-notifs');
+if (enableSearchNotifsToggle) {
+    enableSearchNotifsToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            enableNotifs().then((areNotifsEnabled) => {
+                if (areNotifsEnabled) { // able to enable notifs
+                    localStorage.setItem('areSearchNotifsEnabled', 'true');
+                } else { // Unable to enable notifs
+                    e.target.checked = false;
+                    localStorage.setItem('areSearchNotifsEnabled', 'false');
+                }
+            }).catch((error) => { // Unable to enable notifs
+                console.log('Failed to enable notifications:', error);
+            });
+        } else {
+            localStorage.setItem('areSearchNotifsEnabled', 'false');
+        }
+    });
+}
+
+// Load notif state on any page
+window.addEventListener('load', () => {
+    // Check if notification permissions were revoked
+    if (Notification.permission !== 'granted') {
+        localStorage.setItem('areLocalNotifsEnabled', 'false');
         localStorage.setItem('areSearchNotifsEnabled', 'false');
     }
-});
 
-window.addEventListener('load', () => {
-    let notifStatus = localStorage.getItem('areNotifsEnabled');
-    document.getElementById('enable-notifs').checked = notifStatus === 'true' ? true : false;
-    if ( notifStatus === 'true' )
-        callRegularNotifs();
-    else {
+    // Call hourly notifs
+    let localNotifStatus = localStorage.getItem('areLocalNotifsEnabled');
+    if (localNotifStatus === 'true') {
+        callLocalNotifs();
+    } else {
         clearTimeout(hourTimer);
     }
 
-    let searchNotifStatus = localStorage.getItem('areSearchNotifsEnabled');
-    document.getElementById('enable-search-notifs').checked = searchNotifStatus === 'true' ? true : false;
+    // If on notifications page, set correct toggles
+    if (enableLocalNotifsToggle) {
+        // Set searchNotif status
+        let localNotifStatus = localStorage.getItem('areLocalNotifsEnabled');
+        document.getElementById('enable-local-notifs').checked = localNotifStatus === 'true' ? true : false;
+
+        // Set searchNotif status
+        let searchNotifStatus = localStorage.getItem('areSearchNotifsEnabled');
+        document.getElementById('enable-search-notifs').checked = searchNotifStatus === 'true' ? true : false;
+    }
 })
+
+
+// Check if you're on main page for search notifs
+let getWeatherButton = document.getElementById('getWeather');
+
+if(getWeatherButton) {
+    getWeatherButton.addEventListener('click', function () {
+        const city = document.getElementById('city').value;
+        callSearchNotifs(city);
+    });
+}
 
 // Handle toggle on
 function enableNotifs() {
-    console.log("Enable notifs");
     return new Promise((resolve, reject) => {
-        console.log("I'm in");
+        // Browser doesn't support notifs
         if (!('Notification' in window)) {
-            console.log('This browser does not support notifications.');
             alert("This browser does not support notifications.");
             resolve(false);
-        } else {
-            console.log("Notifs in browser");
+        } else { // Browser supports notifs
             if (Notification.permission !== "granted") {
                 Notification.requestPermission().then((permission) => {
+                    // Notification permission granted
                     if (permission === 'granted') {
-                        console.log("Permission granted");
-
-                        // Set start time
-                        let notifTime = new Date();
-                        localStorage.setItem('lastNotifTime', notifTime);
-
-                        getLocation().then(currentCoords => {
-                            sendNotifs(getSevereAlerts, currentCoords);
-                        }).catch(error => {
-                            console.log('Error getting local notif: ', error);
-                        });
-
                         resolve(true);
-                    } else {
-                        console.log('Permission not granted.');
+                    } else { // Notification permission not granted; can't turn toggle on
                         alert('Allow notifications to turn this feature on.');
                         resolve(false);
                     }
                 }).catch((err) => {
-                    console.log('An error occurred while granting notification permissions. ', err);
                     alert('Error enabling notifications. Please try again later.');
-                    reject(err);
+                    reject(false);
                 })
             } else {
-                callRegularNotifs();
                 resolve(true);
             }
         }
@@ -95,22 +131,53 @@ function enableNotifs() {
 }
 
 // Call notifications every hour (and when notifs are first turned on)
-function callRegularNotifs() {
-    let timeSinceLastNotif = Date.now() - localStorage.getItem('lastNotifTime');
-
-    if (timeSinceLastNotif >= 3600000 || !timeSinceLastNotif) {
-        getLocation().then(currentCoords => {
-            sendNotifs(getSevereAlerts, currentCoords);
-            localStorage.setItem('lastNotifTime', Date.now());
-            hourTimer = setTimeout(callRegularNotifs, 3600000);
-        }).catch(error => {
-            console.log('Error getting local notifs: ', error);
-        });
-    }
+function callLocalNotifs() {
+    return new Promise((resolve, reject) => {
+        if (localStorage.getItem('areLocalNotifsEnabled') === 'true') {
+            console.log("In callLocalNotifs");
+            let lastNotifTime = localStorage.getItem('lastNotifTime');
+            let timeSinceLastNotif = Date.now() - lastNotifTime;
+            console.log("Last notif time: ", localStorage.getItem('lastNotifTime'));
+            console.log("timesincelastnotif: ", timeSinceLastNotif);
+            
+            console.log("islocaljustenabled", localStorage.getItem('isLocalJustEnabled'));
+            if (!lastNotifTime || timeSinceLastNotif >= HOUR_LENGTH
+                || localStorage.getItem('isLocalJustEnabled') === 'true') {
+                console.log("Reset timeout");
+                if (navigator.geolocation) {
+                    getLocation().then(currentCoords => {
+                        console.log("current coords: ", null);
+                        if (currentCoords !== null) {
+                            sendNotifs(getSevereAlerts, currentCoords);
+                            localStorage.setItem('lastNotifTime', Date.now());
+                            console.log("Last notif time (now): ", localStorage.getItem('lastNotifTime'));
+                            hourTimer = setTimeout(callLocalNotifs, HOUR_LENGTH);
+                            resolve(true);
+                        } else {
+                            alert("Allow location permissions to enable location-based notifications.");
+                            resolve(false);
+                        }
+                    }).catch(error => {
+                        alert("Failed to enable location-based notifications.");
+                        reject(error);
+                    })
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                    resolve(false);
+                }
+                localStorage.setItem('isLocalJustEnabled', 'false');
+                console.log(localStorage.getItem('isLocalJustEnabled'));
+            } else {
+                hourTimer = setTimeout(callLocalNotifs, HOUR_LENGTH - timeSinceLastNotif);
+                resolve(true);
+            }
+        }
+    });
 }
 
 // Bring up severe weather notifications for cities that are searched up, if setting is on
 function callSearchNotifs(city) {
+    console.log("Can we call search notifs: ", localStorage.getItem('areSearchNotifsEnabled'));
     let areSearchNotifsEnabled = localStorage.getItem('areSearchNotifsEnabled');
     if (areSearchNotifsEnabled === 'false') {
         return;
@@ -137,21 +204,18 @@ function sendNotifs(alertType, coords) {
     });
 }
 
-// Receive regular alerts
-function getRegularAlerts() {
-    return new Promise((resolve, reject) => {
-        let alerts = [];
-        getLocation()
-            .then(currentCoords => getSevereAlerts(currentCoords.lat, currentCoords.lon))
-            .then(fetchedAlerts => {
-                alerts.push(...fetchedAlerts);
-                console.log(alerts.length);
-                resolve(alerts);
-            })
-            .catch(error => {
-                console.log("Error:", error);
-                reject(error);
-            });
+// Receive local alerts
+function getLocalAlerts() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            // Resolve with null if geolocation is not supported
+            resolve(null);
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => resolve(position.coords),
+                (error) => resolve(null) // Resolve with null if there is an error
+            );
+        }
     });
 }
 
@@ -159,18 +223,62 @@ function getRegularAlerts() {
 function getLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                console.log("Geolocation: ", lat, ",", lon);
-                resolve({ lat, lon });
-            }, (error) => {
-                reject(error);
+            checkLocationPermission().then(permissionStatus => {
+                if (permissionStatus === 'granted') {
+                    // Permission already granted, get the current position
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        console.log("Geolocation: ", lat, ",", lon);
+                        resolve({ lat, lon });
+                    }, (error) => {
+                        reject(error);
+                    });
+                } else if (permissionStatus === 'denied') {
+                    alert("Allow location permissions to use the location-based notifications.");
+                    resolve(null);
+                } else {
+                    alert("Allow location permissions to use the location-based notifications.");
+                    resolve(null);
+                }
+            }).catch(error => {
+                console.error("Error checking location permission: ", error);
+                resolve(null);
             });
         } else {
             alert('Geolocation is not supported by this browser.');
             reject(new Error('Geolocation is not supported by this browser.'));
         }
+        // if (navigator.geolocation) {
+        //     navigator.geolocation.getCurrentPosition((position) => {
+        //         const lat = position.coords.latitude;
+        //         const lon = position.coords.longitude;
+        //         console.log("Geolocation: ", lat, ",", lon);
+        //         resolve({ lat, lon });
+        //     }, (error) => {
+        //         reject(error);
+        //     });
+        // } else {
+        //     alert('Geolocation is not supported by this browser.');
+        //     reject(new Error('Geolocation is not supported by this browser.'));
+        // }
+    });
+}
+
+// Check location permissions
+function checkLocationPermission() {
+    // Check if the Permissions API is supported
+    if (!navigator.permissions) {
+        console.error("Permissions API is not supported in this browser.");
+        return Promise.resolve('unsupported');
+    }
+
+    // Query the geolocation permission status
+    return navigator.permissions.query({ name: 'geolocation' }).then(permissionStatus => {
+        return permissionStatus.state; // 'granted', 'denied', or 'prompt'
+    }).catch(error => {
+        console.error("Error checking geolocation permission: ", error);
+        return 'error';
     });
 }
 
@@ -233,23 +341,3 @@ function getCityCoords(city) {
         });
     });
 }
-
-// // DAILY WEATHER ALERTS
-
-// // Set weather alerts for same time every day
-// function runAtSpecificTimeOfDay(hour, minutes, func)
-// {
-//   const twentyFourHours = 86400000;
-//   const now = new Date();
-//   let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
-//   if (eta_ms < 0)
-//   {
-//     eta_ms += twentyFourHours;
-//   }
-//   setTimeout(function() {
-//     //run once
-//     func();
-//     // run every 24 hours from now on
-//     setInterval(func, twentyFourHours);
-//   }, eta_ms);
-// }
