@@ -42,5 +42,5 @@ document.getElementById('zoom-in').onclick = function () {
 };
  // Handle click event for the Back to Home button
  document.getElementById('backHomeButton').addEventListener('click', function() {
-  window.location.href = 'index.html';
+  window.location.href = '/index.html';
 });

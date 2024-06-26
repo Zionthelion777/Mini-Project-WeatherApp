@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Map</title>
+    <link rel="stylesheet" href="../node_modules/ol/ol.css">
+    <link rel="stylesheet" href="src/index.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="header">
+          <h1>Wind Map</h1>
+          <button id="backHomeButton" class="back-button">Back to Home</button>
+      </div>
+      <div class="map-container">
+        <a class="skiplink" href="#map">Go to map</a>
+        <div id="map" class="map" tabindex="0"></div>
+        <button id="zoom-out">Zoom out</button>
+        <button id="zoom-in">Zoom in</button>
+      </div>
+      
+    
+      <div class="footer">
+          <a href="temperature.html" class="map-icon">
+              <img src="assets/temperature-icon.png" alt="Temperature Map" title="Temperature Map">
+          </a>
+          <a href="precipitation.html" class="map-icon">
+              <img src="assets/precipitation-icon.png" alt="Precipitation Map" title="Precipitation Map">
+          </a>
+          <a href="wind.html" class="map-icon active">
+              <img src="assets/wind-icon.png" alt="Wind Map" title="Wind Map">
+          </a>
+      </div>
+  </div>
+    
+    
+
+    <script type="module" src="src/windMap.js"></script>
+    <script type="module" src="../notifications/notifications.js"></script>
+  </body>
+</html>

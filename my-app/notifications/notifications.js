@@ -13,11 +13,8 @@ if (enableLocalNotifsToggle) {
                     if (areNotifsEnabled) { // able to enable notifs
                         
                         localStorage.setItem('areLocalNotifsEnabled', 'true');
-                        console.log(localStorage.getItem('areLocalNotifsEnabled', 'true'));
                         localStorage.setItem('isLocalJustEnabled', 'true');
-                        console.log(localStorage.getItem('isLocalJustEnabled'));
                         callLocalNotifs().then(success => {
-                            console.log("are local notifs enabled: ", success);
                             if (success) {
                                 e.target.checked = true;
                             } else {
@@ -69,6 +66,10 @@ window.addEventListener('load', () => {
     if (Notification.permission !== 'granted') {
         localStorage.setItem('areLocalNotifsEnabled', 'false');
         localStorage.setItem('areSearchNotifsEnabled', 'false');
+    }
+    // Check if location permissions were revoked
+    if (checkLocationPermission() !== 'granted') {
+        localStorage.setItem('areLocalNotifsEnabled', 'false');
     }
 
     // Call hourly notifs
@@ -134,40 +135,33 @@ function enableNotifs() {
 function callLocalNotifs() {
     return new Promise((resolve, reject) => {
         if (localStorage.getItem('areLocalNotifsEnabled') === 'true') {
-            console.log("In callLocalNotifs");
             let lastNotifTime = localStorage.getItem('lastNotifTime');
             let timeSinceLastNotif = Date.now() - lastNotifTime;
-            console.log("Last notif time: ", localStorage.getItem('lastNotifTime'));
-            console.log("timesincelastnotif: ", timeSinceLastNotif);
             
-            console.log("islocaljustenabled", localStorage.getItem('isLocalJustEnabled'));
+            // If it's been over an hour, send new notif
             if (!lastNotifTime || timeSinceLastNotif >= HOUR_LENGTH
                 || localStorage.getItem('isLocalJustEnabled') === 'true') {
-                console.log("Reset timeout");
                 if (navigator.geolocation) {
                     getLocation().then(currentCoords => {
-                        console.log("current coords: ", null);
                         if (currentCoords !== null) {
                             sendNotifs(getSevereAlerts, currentCoords);
                             localStorage.setItem('lastNotifTime', Date.now());
-                            console.log("Last notif time (now): ", localStorage.getItem('lastNotifTime'));
                             hourTimer = setTimeout(callLocalNotifs, HOUR_LENGTH);
                             resolve(true);
                         } else {
-                            alert("Allow location permissions to enable location-based notifications.");
                             resolve(false);
                         }
                     }).catch(error => {
                         alert("Failed to enable location-based notifications.");
                         reject(error);
                     })
-                } else {
+                } else { // Geolocation not supported
                     alert('Geolocation is not supported by this browser.');
                     resolve(false);
                 }
                 localStorage.setItem('isLocalJustEnabled', 'false');
-                console.log(localStorage.getItem('isLocalJustEnabled'));
             } else {
+                // Reduce how much time is left
                 hourTimer = setTimeout(callLocalNotifs, HOUR_LENGTH - timeSinceLastNotif);
                 resolve(true);
             }
@@ -177,17 +171,19 @@ function callLocalNotifs() {
 
 // Bring up severe weather notifications for cities that are searched up, if setting is on
 function callSearchNotifs(city) {
-    console.log("Can we call search notifs: ", localStorage.getItem('areSearchNotifsEnabled'));
     let areSearchNotifsEnabled = localStorage.getItem('areSearchNotifsEnabled');
     if (areSearchNotifsEnabled === 'false') {
         return;
     }
-    
-    getCityCoords(city).then(cityCoords => {
-        sendNotifs(getSevereAlerts, cityCoords);
-    }).catch(error => {
-        console.log('Error getting city notifs: ', error);
-    });
+
+    // If city exists
+    if (getCityCoords(city)) {
+        getCityCoords(city).then(cityCoords => {
+            sendNotifs(getSevereAlerts, cityCoords);
+        }).catch(error => {
+            console.log("City not found.");
+        });
+    }
 }
 
 // Create & send out notifs
@@ -196,7 +192,6 @@ function sendNotifs(alertType, coords) {
         for (const alert of alertData) {
             let title = alert.title;
             let body = alert.body;
-            console.log(title, body);
             const notification = new Notification(title, { body: body });
         }
     }).catch(error => {
@@ -223,17 +218,18 @@ function getLocalAlerts() {
 function getLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
+            // check if we can get location
             checkLocationPermission().then(permissionStatus => {
                 if (permissionStatus === 'granted') {
                     // Permission already granted, get the current position
                     navigator.geolocation.getCurrentPosition((position) => {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-                        console.log("Geolocation: ", lat, ",", lon);
                         resolve({ lat, lon });
                     }, (error) => {
                         reject(error);
                     });
+                // Location not allowed
                 } else if (permissionStatus === 'denied') {
                     alert("Allow location permissions to use the location-based notifications.");
                     resolve(null);
@@ -242,26 +238,12 @@ function getLocation() {
                     resolve(null);
                 }
             }).catch(error => {
-                console.error("Error checking location permission: ", error);
                 resolve(null);
             });
         } else {
             alert('Geolocation is not supported by this browser.');
             reject(new Error('Geolocation is not supported by this browser.'));
         }
-        // if (navigator.geolocation) {
-        //     navigator.geolocation.getCurrentPosition((position) => {
-        //         const lat = position.coords.latitude;
-        //         const lon = position.coords.longitude;
-        //         console.log("Geolocation: ", lat, ",", lon);
-        //         resolve({ lat, lon });
-        //     }, (error) => {
-        //         reject(error);
-        //     });
-        // } else {
-        //     alert('Geolocation is not supported by this browser.');
-        //     reject(new Error('Geolocation is not supported by this browser.'));
-        // }
     });
 }
 
@@ -269,20 +251,18 @@ function getLocation() {
 function checkLocationPermission() {
     // Check if the Permissions API is supported
     if (!navigator.permissions) {
-        console.error("Permissions API is not supported in this browser.");
         return Promise.resolve('unsupported');
     }
 
-    // Query the geolocation permission status
+    // Send query
     return navigator.permissions.query({ name: 'geolocation' }).then(permissionStatus => {
         return permissionStatus.state; // 'granted', 'denied', or 'prompt'
     }).catch(error => {
         console.error("Error checking geolocation permission: ", error);
-        return 'error';
     });
 }
 
-// Get severe weather alerts
+// Retrieve severe weather alert information from API
 function getSevereAlerts(coords) {
     let lat = coords.lat;
     let lon = coords.lon;
@@ -313,14 +293,13 @@ function getSevereAlerts(coords) {
                 resolve(alerts);
             })
             .catch(error => {
-                console.error('Error fetching severe weather alert data:', error);
                 alert('Error fetching severe weather alert data. Please try again later.');
                 reject(error);
             });
     });
 }
 
-// Get coordinates from city name
+// Get coordinates from city name (only first result)
 function getCityCoords(city) {
     geocodingApiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${openWeatherApiKey}`;
     return new Promise((resolve, reject) => {
@@ -336,7 +315,6 @@ function getCityCoords(city) {
             resolve({ lat: data[0].lat, lon: data[0].lon });
         })
         .catch(error => {
-            console.error('Error finding city coordinates: ', error);
             reject(error);
         });
     });
@@ -366,5 +344,5 @@ function getCityCoords(city) {
 
 // Handle click event for the Back to Home button
 document.getElementById('backHomeButton').addEventListener('click', function() {
-    window.location.href = 'index.html';
+    window.location.href = '/index.html';
   });
