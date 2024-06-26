@@ -47,9 +47,13 @@ WeatherWise is a user-friendly web application designed to provide comprehensive
 
 WeatherWise is built using the following technologies:
 
-- **OpenWeatherMaps API**: For fetching real-time weather data.
+- **Vite**: For development and build tooling.
+- **HTML Geolocation API**: For retrieving user location.
+- **OpenWeatherMaps API**: For fetching real-time weather data and converting city names to coordinates.
 - **MapTile API**: For rendering interactive maps.
 - **OpenLayers API**: For advanced map functionalities.
+- **Notification API**: For creating and sending notifications.
+- **Azure Maps API**: For receiving live severe weather alerts.
 - **HTML**: For structuring the web pages.
 - **CSS**: For styling the application.
 - **JavaScript**: For making the app interactive and dynamic.
