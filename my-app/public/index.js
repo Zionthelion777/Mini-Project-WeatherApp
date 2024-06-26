@@ -277,6 +277,7 @@ function renderAdditionalData(data) {
     document.getElementById('tempMapButton').addEventListener('click', function() {
         window.location.href = 'temperature.html';
     });
+     
 
     // Get current location on page load
     getCurrentLocation();

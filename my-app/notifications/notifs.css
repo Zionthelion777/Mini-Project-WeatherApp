@@ -84,3 +84,20 @@ input:checked + .slider:before {
     align-items: center;
     flex-direction: row;
 }
+
+/* New styles for the back button */
+.back-button {
+    position: absolute;
+    top: 47px;
+    right: 550px;
+    background: #4e54c8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background: #3b3f99;
+}

@@ -554,11 +554,11 @@ body {
 /* Get Location Button Styling */
 .GetLocation {
   position: absolute;
-  top: 20px;
-  right: 550px;
+  top: 40px;
+  right: 560px;
   width: 10%;
   margin-top: 20px;
-  padding: 10px 20px;
+  padding: 5px 5px;
   background: #4e54c8;
   color: white;
   text-align: center;
@@ -566,11 +566,37 @@ body {
   font-weight: bold;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
   transition: background 0.3s, transform 0.3s;
 }
 
 .GetLocation:hover {
   background: #6a70e0;
+  transform: scale(1.1);
+}
+
+/* Settings Button */
+.settings-button {
+  position: relative; /* Make the container a positioned ancestor */
+  bottom: 1px;
+  left: 400px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  transition: transform 0.3s;
+}
+
+.settings-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.settings-button:hover {
   transform: translateY(-3px);
 }

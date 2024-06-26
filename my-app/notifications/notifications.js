@@ -150,3 +150,8 @@ function getSevereAlerts(lat, lon) {
             });
     });
 }
+
+ // Handle click event for the Back to Home button
+ document.getElementById('backHomeButton').addEventListener('click', function() {
+    window.location.href = 'index.html';
+  });
