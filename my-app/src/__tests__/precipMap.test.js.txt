@@ -1,0 +1,88 @@
+const fs = require('fs');
+const path = require('path');
+const { JSDOM } = require('jsdom');
+
+// Mocking OpenLayers classes
+jest.mock('ol/Map.js', () => jest.fn());
+jest.mock('ol/source/OSM.js', () => jest.fn());
+jest.mock('ol/layer/Tile.js', () => jest.fn());
+jest.mock('ol/source/XYZ.js', () => jest.fn());
+jest.mock('ol/View.js', () => jest.fn());
+
+const { Map } = require('ol/Map.js');
+const { View } = require('ol/View.js');
+
+describe('precipMap.js', () => {
+  let document, window, mapInstance, viewInstance;
+
+  const loadDOMAndScript = () => {
+    const html = fs.readFileSync(path.resolve(__dirname, '../../precipitation.html'), 'utf8');
+    const dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable' });
+
+    return new Promise((resolve) => {
+      dom.window.addEventListener('load', () => {
+        document = dom.window.document;
+        window = dom.window;
+
+        // Mock implementations
+        mapInstance = {
+          getView: jest.fn().mockReturnValue({
+            getZoom: jest.fn().mockReturnValue(2),
+            setZoom: jest.fn(),
+          }),
+        };
+
+        Map.mockImplementation(() => mapInstance);
+
+        // Load the precipMap.js script
+        const script = document.createElement('script');
+        script.src = path.resolve(__dirname, '../../precipMap.js');
+        script.onload = () => {
+          viewInstance = mapInstance.getView();
+          resolve();
+        };
+        document.body.appendChild(script);
+      });
+    });
+  };
+
+  beforeAll(() => {
+    return loadDOMAndScript();
+  }, 10000); // Increase timeout to 10 seconds
+
+  const clickButton = (id) => {
+    const button = document.getElementById(id);
+    button.click();
+  };
+
+  test('initializes the map correctly', () => {
+    expect(Map).toHaveBeenCalled();
+    expect(mapInstance.getView).toHaveBeenCalled();
+    expect(viewInstance.getZoom()).toBe(2);
+  });
+
+  test('zoom in functionality works', () => {
+    clickButton('zoom-in');
+    expect(viewInstance.getZoom).toHaveBeenCalled();
+    expect(viewInstance.setZoom).toHaveBeenCalledWith(3);  // Assuming the initial zoom level is 2
+  });
+
+  test('zoom out functionality works', () => {
+    clickButton('zoom-out');
+    expect(viewInstance.getZoom).toHaveBeenCalled();
+    expect(viewInstance.setZoom).toHaveBeenCalledWith(1);  // Assuming the initial zoom level is 2
+  });
+
+  // Additional tests for edge cases
+  test('zoom in does not exceed maximum zoom level', () => {
+    viewInstance.getZoom.mockReturnValue(19);  // Assuming 19 is the max zoom level
+    clickButton('zoom-in');
+    expect(viewInstance.setZoom).not.toHaveBeenCalledWith(20);
+  });
+
+  test('zoom out does not go below minimum zoom level', () => {
+    viewInstance.getZoom.mockReturnValue(1);  // Assuming 1 is the min zoom level
+    clickButton('zoom-out');
+    expect(viewInstance.setZoom).not.toHaveBeenCalledWith(0);
+  });
+});

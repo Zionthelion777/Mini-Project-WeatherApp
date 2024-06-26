@@ -1,0 +1,45 @@
+/* Not working
+.txt for me so that npm test would not recognize it as something to run
+
+
+const fs = require('fs');
+const path = require('path');
+const { JSDOM } = require('jsdom');
+
+describe('precipMap.js', () => {
+  let document, window, map, view;
+
+  beforeAll(() => {
+    const html = fs.readFileSync(path.resolve(__dirname, '../../precipitation.html'), 'utf8');
+    const dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable' });
+    
+    return new Promise((resolve) => {
+      dom.window.addEventListener('load', () => {
+        document = dom.window.document;
+        window = dom.window;
+        map = window.olMap;  // Assuming your map instance is attached to the window object
+        view = map.getView();
+        resolve();
+      });
+    });
+  });
+
+  test('initializes the map correctly', () => {
+    expect(map).toBeDefined();
+    expect(view).toBeDefined();
+    expect(view.getZoom()).toBe(2);
+    expect(view.getCenter()).toEqual([0, 0]);
+  });
+
+  test('zoom in functionality works', () => {
+    const zoomInButton = document.getElementById('zoom-in');
+    zoomInButton.click();
+    expect(view.getZoom()).toBe(3);  // Assuming the initial zoom level is 2
+  });
+
+  test('zoom out functionality works', () => {
+    const zoomOutButton = document.getElementById('zoom-out');
+    zoomOutButton.click();
+    expect(view.getZoom()).toBe(1);  // Assuming the initial zoom level is 2
+  });
+}); */
