@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maptiler weather layers</title>
+  <link href="/styles/base.css?t=1718613427" rel="stylesheet">
+  <script src="/js/bootstrap.bundle.min.js?t=1718613427"></script>
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet" />
+  <script src="https://cdn.maptiler.com/maptiler-weather/v2.0.0/maptiler-weather.umd.min.js"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <button id="backHomeButton" class="back-button">Back to Home</button>
+  <div id="time-info">
+    <span id="time-text"></span>
+    <button id="play-pause-bt" class="btn btn-primary btn-sm time-button">Play 3600x</button>
+    <input type="range" id="time-slider" min="0" max="11" step="1">
+  </div>
+
+  <div id="variable-name">Wind</div>
+  <div id="pointer-data"></div>
+  <div id="map">
+    <ul id="buttons">
+      <li id="precipitation" class="btn btn-primary button">Precipitation</li>
+      <li id="pressure" class="btn btn-primary button">Pressure</li>
+      <li id="radar" class="btn btn-primary button">Radar</li>
+      <li id="temperature" class="btn btn-primary button">Temperature</li>
+      <li id="wind" class="btn btn-primary button">Wind</li>
+    </ul>
+  </div>
+  <script type="module" src="animatedmap.js"></script>
+</body>
+</html>

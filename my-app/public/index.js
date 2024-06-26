@@ -270,7 +270,7 @@ function renderAdditionalData(data) {
 
     // Handle click event for the Animated Map Button
     document.getElementById('animatedMapButton').addEventListener('click', function() {
-        window.location.href = 'animatedMap.html';
+        window.location.href = 'animatedmap/index.html';
     });
 
     // Handle click event for the Temperature Map button
