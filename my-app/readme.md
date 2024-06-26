@@ -28,6 +28,9 @@ WeatherWise is a user-friendly web application designed to provide comprehensive
 - **7-Day Forecast**: Offers a detailed weather outlook for the next week.
 - **Daily Summaries**: High and low temperatures, weather conditions, and precipitation chances.
 
+## News of the Day
+- **News Articles**: Has current news articles on the side
+
 ### Interactive Maps 🗺️
 - **Weather Maps**: Displays temperature, precipitation, and wind patterns.
 - **Zoom and Pan**: Allows users to zoom in and out and pan for detailed views of specific areas.
