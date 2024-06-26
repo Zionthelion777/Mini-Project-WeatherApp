@@ -160,7 +160,7 @@ body {
 
 #suggestions {
     position: absolute;
-    top: 100%; /* Make sure it is right below the input field */
+    top: 96%; /* Make sure it is right below the input field */
     left: 0;
     right: 0;
     background-color: white;
@@ -578,11 +578,11 @@ body {
 }
 
 /* Settings Button */
-.settings-button {
-  position: relative; /* Make the container a positioned ancestor */
-  bottom: 1px;
-  left: 400px;
-  width: 40px;
+#settings-button {
+  position: relative; 
+  bottom: auto ;
+  left: auto;
+  width: auto;
   height: 40px;
   background: rgba(0, 0, 0, 0.5);
   border: none;
@@ -595,11 +595,11 @@ body {
   transition: transform 0.3s;
 }
 
-.settings-button img {
+#settings-button img {
   width: 20px;
   height: 20px;
 }
 
-.settings-button:hover {
+#settings-button:hover {
   transform: translateY(-3px);
 }

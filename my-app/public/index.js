@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let currentHourlyPage = 0; // Track the current page for hourly data
     const hoursPerPage = 5; // Number of hours to display per page
 
+
     toggleButton.addEventListener('click', () => {
         if (additionalDataContainer.style.display === 'none' || additionalDataContainer.style.display === '') {
             additionalDataContainer.style.display = 'flex';
@@ -179,6 +180,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
                 <div class="temp">${Math.round(forecast.temp.day)}°${currentUnits === 'imperial' ? 'F' : 'C'}</div>
             `;
+            dayElement.innerHTML = `
+            <div class="day-name">${day}</div>
+            <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather icon">
+            <div class="temp">${Math.round(forecast.temp.day)}°${currentUnits === 'imperial' ? 'F' : 'C'}</div>
+            <div class="high-low">
+                <div class="high">${Math.round(forecast.temp.max)}°${currentUnits === 'imperial' ? 'F' : 'C'}</div>
+                <div class="low">${Math.round(forecast.temp.min)}°${currentUnits === 'imperial' ? 'F' : 'C'}</div>
+            </div>
+        `
 
             dailyForecastContainer.appendChild(dayElement);
         });
@@ -277,8 +287,14 @@ function renderAdditionalData(data) {
     document.getElementById('tempMapButton').addEventListener('click', function() {
         window.location.href = 'temperature.html';
     });
-     
+    // Handle click event for the Temperature Map button
+    document.getElementById('settings-button').addEventListener('click', function() {
+        window.location.href = 'notifications.html';
+    });
+    
 
+
+    
     // Get current location on page load
     getCurrentLocation();
 
@@ -363,6 +379,7 @@ function renderAdditionalData(data) {
         }
     });
 });
+
  //fetches news
  fetchNewsData();
 
@@ -414,16 +431,7 @@ function renderAdditionalData(data) {
      if (!document.querySelector('.news-container')) {
          document.body.appendChild(newsContainer);
      }
+     
  }
 
-  // Show/Hide News functionality
-  document.getElementById('showNewsButton').addEventListener('click', function() {
-    const newsContainer = document.querySelector('.news-container');
-    if (newsContainer.style.display === 'none' || newsContainer.style.display === '') {
-        newsContainer.style.display = 'block';
-        this.innerHTML = 'Hide News';
-    } else {
-        newsContainer.style.display = 'none';
-        this.innerHTML = 'Show News';
-    }
-});
+  
