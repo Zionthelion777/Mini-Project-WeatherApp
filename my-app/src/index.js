@@ -289,7 +289,7 @@ function renderAdditionalData(data) {
     });
     // Handle click event for the Temperature Map button
     document.getElementById('settings-button').addEventListener('click', function() {
-        window.location.href = 'notifications.html';
+        window.location.href = 'notifications/index.html';
     });
     
 
